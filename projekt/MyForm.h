@@ -73,6 +73,7 @@ namespace projekt {
 		}
 #pragma endregion
 	private: System::Void MyForm_Load(System::Object^ sender, System::EventArgs^ e) {
+		Console::WriteLine(L"SAJKHMDAIJSDHMAKSMD");
 	}
 	};
 }

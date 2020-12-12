@@ -121,12 +121,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Konto.cpp" />
+    <ClCompile Include="ListaWalut.cpp" />
+    <ClCompile Include="Logowanie.cpp" />
     <ClCompile Include="MyForm.cpp" />
+    <ClCompile Include="Operacja.cpp" />
+    <ClCompile Include="Rachunek.cpp" />
+    <ClCompile Include="RodzajRachunku.cpp" />
+    <ClCompile Include="Waluta.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Konto.h" />
+    <ClInclude Include="ListaWalut.h" />
+    <ClInclude Include="Logowanie.h" />
     <ClInclude Include="MyForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="Operacja.h" />
+    <ClInclude Include="Rachunek.h" />
+    <ClInclude Include="RodzajRachunku.h" />
+    <ClInclude Include="Waluta.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MyForm.resx">
