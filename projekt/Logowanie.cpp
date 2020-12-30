@@ -1,23 +1,20 @@
 #include "Logowanie.h"
 #include <ctime>
+#include <string>
+#include "API.h"
 
-using namespace std;
-Logowanie::Logowanie(int numerKonta, char* haslo) {
+Logowanie::Logowanie(std::string numerKonta, std::string haslo) {
 	this->_numerKonta = numerKonta;
 	this->_data = time(0);
-	this->_powodzenie = NULL;
-	System::Diagnostics::Debug::WriteLine(L"ASD AS DAS DAS D");
-};
-Logowanie::~Logowanie() {
-	delete this;
+	this->_powodzenie = API::Get().Logowanie(numerKonta, haslo);
 };
 
-int Logowanie::NumerKonta() {
+std::string Logowanie::NumerKonta() {
 	return this->_numerKonta;
 };
 time_t Logowanie::Data() {
 	return this->_data;
 };
-bool Logowanie::Powodzenie() {
+int Logowanie::Powodzenie() {
 	return this->_powodzenie;
 };

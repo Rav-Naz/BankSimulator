@@ -1,16 +1,16 @@
 #pragma once
 #include <ctime>
+#include <string>
 class Logowanie
 {
 private:
-	int _numerKonta;
+	std::string _numerKonta;
 	time_t _data; // kiedy zosta³a podjêta próba logowania
-	bool _powodzenie; // czy próba logowania siê powiod³a
+	int _powodzenie; // czy próba logowania siê powiod³a
 public:
-	Logowanie(int numerKonta, char* haslo);
-	~Logowanie();
+	Logowanie(std::string numerKonta, std::string haslo);
 
-	int NumerKonta();
+	std::string NumerKonta();
 	time_t Data();
-	bool Powodzenie();
+	int Powodzenie();
 };
