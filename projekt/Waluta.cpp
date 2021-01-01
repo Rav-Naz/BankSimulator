@@ -1,14 +1,12 @@
 #include "Waluta.h"
+#include <string>
 
 Waluta::Waluta() {
 	this->_id = 1;
 	this->_nazwa = "PLN";
 	this->_przelicznik = 1;
 };
-Waluta::~Waluta() {
-	delete this;
-};
-Waluta::Waluta(int ID, char* Nazwa, float Przelicznik) {
+Waluta::Waluta(int ID, std::string Nazwa, float Przelicznik) {
 	this->_id = ID;
 	this->_nazwa = Nazwa;
 	this->_przelicznik = Przelicznik;
@@ -22,7 +20,7 @@ Waluta::Waluta(Waluta& wzor) {
 int Waluta::ID() {
 	return this->_id;
 };
-char* Waluta::Nazwa() {
+std::string Waluta::Nazwa() {
 	return this->_nazwa;
 };
 float Waluta::Przelicznik() {

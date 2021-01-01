@@ -1,19 +1,19 @@
 #pragma once
+#include <string>
 class RodzajRachunku
 {
 private:
 	int _id;
-	char* _nazwa;
+	std::string _nazwa;
 	float _oprocentowanie; // w procentach
 	float _kosztyMiesieczne;
 public:
 	RodzajRachunku();
-	~RodzajRachunku();
-	RodzajRachunku(int ID, char* Nazwa, float Oprocentowanie, float KosztyMiesieczne);
+	RodzajRachunku(int ID, std::string Nazwa, float Oprocentowanie, float KosztyMiesieczne);
 	RodzajRachunku(RodzajRachunku& wzor);
 
 	int ID();
-	char* Nazwa();
+	std::string Nazwa();
 	float Oprocentowanie();
 	float KosztyMiesieczne();
 };

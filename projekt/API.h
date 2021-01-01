@@ -1,8 +1,11 @@
 #pragma once
 #include <mysql.h>
 #include <string>
-#include "Waluta.h"
 #include <iostream>
+#include <list>
+
+#include "Waluta.h"
+#include "RodzajRachunku.h"
 class API
 {
 public:
@@ -16,10 +19,15 @@ public:
 	// Bazy danych
 	void InitDB(std::string host, std::string user, std::string password, std::string db, int port);
 	bool isConnected();
+	// Zmienne globalne 
+	std::list<Waluta> listaWalut;
+	std::list<RodzajRachunku> listaRodzajiRachunkow;
 	// Logowanie
 	int Logowanie(std::string id_uzytkownika, std::string haslo);
 	// Waluty
 	void PobierzWaluty();
+	// Rodzaj rachunku
+	void PobierzRodzajeRachunku();
 private:
 	API() {};
 	MYSQL * conn;

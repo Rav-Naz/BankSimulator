@@ -1,9 +1,18 @@
-#include "API.h"
 #include <mysql.h>
 #include <string>
-#include "Waluta.h"
 #include <iostream>
+#include <list>
+#include <locale.h>
+#include <stdlib.h>
+#include <algorithm>
+#include <msclr\marshal_cppstd.h>
+
+#include "Waluta.h"
+#include "RodzajRachunku.h"
+#include "API.h"
 #include "Szyfracja.h"
+
+// -------------------- Baza danych --------------------
 
 void API::InitDB(std::string host, std::string user, std::string password, std::string db, int port) {
 	this->conn = mysql_init(0);
@@ -18,6 +27,12 @@ bool API::isConnected() {
 		return false;
 	}
 }
+
+// -------------------- Zmienne globalne --------------------
+
+
+
+// -------------------- Logowanie --------------------
 
 int API::Logowanie(std::string id_uzytkownika, std::string haslo) {
 	if (!this->isConnected()) { return -1; }
@@ -92,11 +107,14 @@ int API::Logowanie(std::string id_uzytkownika, std::string haslo) {
 	
 }
 
+// -------------------- Waluty --------------------
+
 void API::PobierzWaluty() {
+
 	if (!this->isConnected()) { return; }
 	MYSQL_ROW row;
 	MYSQL_RES* res;
-	std::string query = "SELECT * FROM projektcpp.waluty;";
+	std::string query = "SELECT * FROM projektcpp.waluty ORDER BY ID DESC;";
 	const char* q = query.c_str();
 	int qstate;
 	qstate = mysql_query(this->conn, q);
@@ -105,8 +123,32 @@ void API::PobierzWaluty() {
 		res = mysql_store_result(this->conn);
 		while (row = mysql_fetch_row(res))
 		{
-			Waluta* waluta = new Waluta(atoi(row[0]), row[1], atof(row[2]));
-			printf("ID: %d, Name: %s, Value: %f\n", waluta->ID(), waluta->Nazwa(), waluta->Przelicznik());
+			this->listaWalut.push_front(Waluta(atoi(row[0]), row[1], atof(row[2])));
+		}
+	}
+	else
+	{
+		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+	}
+};
+
+// -------------------- Rachunki --------------------
+
+// -------------------- Rodzaje rachunków --------------------
+
+void API::PobierzRodzajeRachunku() {
+	if (!this->isConnected()) { return ; }
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	std::string query = "SELECT * FROM projektcpp.rodzaje_rachunkow ORDER BY ID DESC;";
+	const char* q = query.c_str();
+	int qstate;
+	qstate = mysql_query(this->conn, q);
+	if (!qstate)
+	{
+		res = mysql_store_result(this->conn);
+		while (row = mysql_fetch_row(res)) {
+			this->listaRodzajiRachunkow.push_front(RodzajRachunku(atoi(row[0]), row[1], atof(row[2]), atof(row[3])));
 		}
 	}
 	else

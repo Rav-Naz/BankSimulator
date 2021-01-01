@@ -1,4 +1,8 @@
 #pragma once
+#include <iostream>
+
+#include "MyForm2.h"
+#include "MyForm.h"
 
 namespace projekt {
 
@@ -14,6 +18,7 @@ namespace projekt {
 	/// </summary>
 	public ref class MyForm1 : public System::Windows::Forms::Form
 	{
+
 	public:
 		MyForm1(void)
 		{
@@ -56,6 +61,7 @@ namespace projekt {
 	private: System::Windows::Forms::Label^ saldoLabel;
 	private: System::Windows::Forms::Label^ label2;
 	private: System::Windows::Forms::Label^ label1;
+	private: System::Windows::Forms::GroupBox^ groupBox2;
 
 	protected:
 
@@ -93,26 +99,31 @@ namespace projekt {
 			this->saldoLabel = (gcnew System::Windows::Forms::Label());
 			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->label1 = (gcnew System::Windows::Forms::Label());
+			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
 			this->groupBox1->SuspendLayout();
+			this->groupBox2->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// rachunkiComboBox
 			// 
+			this->rachunkiComboBox->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
 			this->rachunkiComboBox->FormattingEnabled = true;
-			this->rachunkiComboBox->Location = System::Drawing::Point(12, 12);
+			this->rachunkiComboBox->Location = System::Drawing::Point(13, 17);
 			this->rachunkiComboBox->Name = L"rachunkiComboBox";
-			this->rachunkiComboBox->Size = System::Drawing::Size(413, 21);
+			this->rachunkiComboBox->Size = System::Drawing::Size(394, 21);
+			this->rachunkiComboBox->Sorted = true;
 			this->rachunkiComboBox->TabIndex = 0;
 			this->rachunkiComboBox->SelectedIndexChanged += gcnew System::EventHandler(this, &MyForm1::comboBox1_SelectedIndexChanged);
 			// 
 			// wylogujBtn
 			// 
-			this->wylogujBtn->Location = System::Drawing::Point(567, 12);
+			this->wylogujBtn->Location = System::Drawing::Point(567, 16);
 			this->wylogujBtn->Name = L"wylogujBtn";
-			this->wylogujBtn->Size = System::Drawing::Size(117, 21);
+			this->wylogujBtn->Size = System::Drawing::Size(117, 32);
 			this->wylogujBtn->TabIndex = 1;
 			this->wylogujBtn->Text = L"Wyloguj";
 			this->wylogujBtn->UseVisualStyleBackColor = true;
+			this->wylogujBtn->Click += gcnew System::EventHandler(this, &MyForm1::wylogujBtn_Click);
 			// 
 			// userIdLabel
 			// 
@@ -151,9 +162,9 @@ namespace projekt {
 			this->groupBox1->Controls->Add(this->label2);
 			this->groupBox1->Controls->Add(this->label1);
 			this->groupBox1->Controls->Add(this->historiaPrzelewowListBox);
-			this->groupBox1->Location = System::Drawing::Point(12, 39);
+			this->groupBox1->Location = System::Drawing::Point(12, 50);
 			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Size = System::Drawing::Size(672, 300);
+			this->groupBox1->Size = System::Drawing::Size(672, 297);
 			this->groupBox1->TabIndex = 4;
 			this->groupBox1->TabStop = false;
 			// 
@@ -309,28 +320,50 @@ namespace projekt {
 			this->label1->TabIndex = 4;
 			this->label1->Text = L"Historia przelewów";
 			// 
+			// groupBox2
+			// 
+			this->groupBox2->Controls->Add(this->rachunkiComboBox);
+			this->groupBox2->Location = System::Drawing::Point(12, 6);
+			this->groupBox2->Name = L"groupBox2";
+			this->groupBox2->Size = System::Drawing::Size(423, 47);
+			this->groupBox2->TabIndex = 5;
+			this->groupBox2->TabStop = false;
+			this->groupBox2->Text = L"Rachunek";
+			// 
 			// MyForm1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(696, 344);
+			this->ClientSize = System::Drawing::Size(696, 353);
+			this->Controls->Add(this->groupBox2);
 			this->Controls->Add(this->groupBox1);
 			this->Controls->Add(this->userIdLabel);
 			this->Controls->Add(this->wylogujBtn);
-			this->Controls->Add(this->rachunkiComboBox);
 			this->Name = L"MyForm1";
 			this->Text = L"Panel klienta";
 			this->Load += gcnew System::EventHandler(this, &MyForm1::MyForm1_Load);
 			this->groupBox1->ResumeLayout(false);
 			this->groupBox1->PerformLayout();
+			this->groupBox2->ResumeLayout(false);
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
 		}
 #pragma endregion
 	private: System::Void comboBox1_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {
+		if (rachunkiComboBox->Text == "Utwórz nowy...") {
+			/*this->Hide();
+			MyForm2 nowyRachunek;
+			nowyRachunek.ShowDialog();*/
+		}
 	}
-private: System::Void MyForm1_Load(System::Object^ sender, System::EventArgs^ e) {
-}
+	private: System::Void MyForm1_Load(System::Object^ sender, System::EventArgs^ e) {
+		rachunkiComboBox->Items->Add("Utwórz nowy...");
+	}
+	private: System::Void wylogujBtn_Click(System::Object^ sender, System::EventArgs^ e) {
+		/*this->Close();
+		MyForm logowanie;
+		logowanie.ShowDialog();*/
+	}
 };
 }

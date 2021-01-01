@@ -1,18 +1,18 @@
 #pragma once
+#include <string>
 class Waluta
 {
 private:
 	int _id;
-	char* _nazwa;
+	std::string _nazwa;
 	float _przelicznik; // w stosunku do PLN
 public:
 	Waluta();
-	~Waluta();
-	Waluta(int ID, char* Nazwa, float Przelicznik);
+	Waluta(int ID, std::string Nazwa, float Przelicznik);
 	Waluta(Waluta &wzor);
 
 	int ID();
-	char* Nazwa();
+	std::string Nazwa();
 	float Przelicznik();
 	float PrzeliczNaWalute(Waluta &wzor);
 };

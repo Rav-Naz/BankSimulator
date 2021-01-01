@@ -6,10 +6,8 @@ RodzajRachunku::RodzajRachunku() {
 	this->_oprocentowanie = 0.0f;
 	this->_kosztyMiesieczne = 1;
 };
-RodzajRachunku::~RodzajRachunku() {
-	delete this;
-};
-RodzajRachunku::RodzajRachunku(int ID, char* Nazwa, float Oprocentowanie, float KosztyMiesieczne) {
+
+RodzajRachunku::RodzajRachunku(int ID, std::string Nazwa, float Oprocentowanie, float KosztyMiesieczne) {
 	this->_id = ID;
 	this->_nazwa = Nazwa;
 	this->_oprocentowanie = Oprocentowanie;
@@ -25,7 +23,7 @@ RodzajRachunku::RodzajRachunku(RodzajRachunku& wzor) {
 int RodzajRachunku::ID() {
 	return this->_id;
 };
-char* RodzajRachunku::Nazwa() {
+std::string RodzajRachunku::Nazwa() {
 	return this->_nazwa;
 };
 float RodzajRachunku::Oprocentowanie() {

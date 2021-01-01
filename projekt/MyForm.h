@@ -1,8 +1,10 @@
 #pragma once
-#include "API.h"
 #include <msclr\marshal_cppstd.h>
+
+#include "API.h"
 #include "Logowanie.h"
 #include "MyForm1.h"
+#include "MyForm2.h"
 
 namespace projekt {
 
@@ -46,9 +48,6 @@ namespace projekt {
 	private: System::Windows::Forms::Label^ label2;
 	private: System::Windows::Forms::TextBox^ hasloTextBox;
 	private: System::Windows::Forms::Button^ zalogujBtn;
-
-
-
 
 	protected:
 
@@ -150,13 +149,16 @@ namespace projekt {
 	}
 	private: System::Void zalogujBtn_Click(System::Object^ sender, System::EventArgs^ e) {
 		
+		this->Hide();
+		MyForm1 form1;
+
 		msclr::interop::marshal_context context;
 		Logowanie* logowanie = new Logowanie(context.marshal_as<std::string>(this->loginTextBox->Text), context.marshal_as<std::string>(this->hasloTextBox->Text));
 
 		if (logowanie->Powodzenie() == 1) { //pomyœlne logowanie
-			this->Hide();
-			MyForm1 clientPanel;
-			clientPanel.ShowDialog();
+			/*this->Hide();
+			MyForm1 pulpitKlienta;
+			pulpitKlienta.ShowDialog();*/
 		} 
 		else if (logowanie->Powodzenie() == 0) { //b³êdne has³o
 			::MessageBox(0, L"Podano b³êdne has³o. Po 3 nieudanych próbach logowania, dostêp do konta zostanie czasowo zablokowany.", L"Uwaga", MB_ICONWARNING);
