@@ -1,10 +1,14 @@
 #pragma once
 #include <list>
+#include <msclr\marshal_cppstd.h>
+
 
 #include "API.h"
 #include "Waluta.h"
 #include "RodzajRachunku.h"
-#include "MyForm1.h"
+#include "Rachunek.h"
+
+#include "MyForm2.h"
 
 namespace projekt {
 
@@ -22,8 +26,10 @@ namespace projekt {
 	public ref class MyForm2 : public System::Windows::Forms::Form
 	{
 	public:
-		MyForm2(void)
+		System::Windows::Forms::Form^ clientPanelForm;
+		MyForm2(System::Windows::Forms::Form^ clientPanel)
 		{
+			clientPanelForm = clientPanel;
 			InitializeComponent();
 		}
 
@@ -310,13 +316,20 @@ namespace projekt {
 		nazwaWlasnaTextBox->Text = managed;
 	}
 	private: System::Void wyjdzBtn_Click(System::Object^ sender, System::EventArgs^ e) {
-		/*this->Close();
-		MyForm1 pulpitKlienta;
-		pulpitKlienta.ShowDialog();*/
+		this->clientPanelForm->Show();
+		this->Close();
 	}
 
 	private: System::Void utworzBtn_Click(System::Object^ sender, System::EventArgs^ e) {
-		/*this->Close();*/
+		msclr::interop::marshal_context context;
+		std::string nazwaWlasna = context.marshal_as<std::string>(this->nazwaWlasnaTextBox->Text);
+		if (nazwaWlasna.length() <= 0) {
+			::MessageBox(0, L"WprowadŸ nazwê w³asn¹", L"Uwaga", MB_ICONWARNING);
+			return;
+		}
+		API::Get().UtworzNowyRachunek(nazwaWlasna, (rachunkiComboBox->SelectedIndex + 1), (walutaComboBox->SelectedIndex + 1));
+		this->clientPanelForm->Show();
+		this->Close();
 	}
 };
 }

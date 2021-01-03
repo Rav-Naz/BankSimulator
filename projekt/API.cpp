@@ -6,11 +6,14 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <msclr\marshal_cppstd.h>
+#include <cstdlib> 
+#include <ctime> 
 
 #include "Waluta.h"
 #include "RodzajRachunku.h"
 #include "API.h"
-#include "Szyfracja.h"
+#include "Konto.h"
+#include "Rachunek.h"
 
 // -------------------- Baza danych --------------------
 
@@ -36,6 +39,7 @@ bool API::isConnected() {
 
 int API::Logowanie(std::string id_uzytkownika, std::string haslo) {
 	if (!this->isConnected()) { return -1; }
+	this->uzytkownik = new Konto(id_uzytkownika, haslo);
 	MYSQL_ROW row;
 	MYSQL_RES* res;
 	int loginFailureLimit = 5;
@@ -43,9 +47,9 @@ int API::Logowanie(std::string id_uzytkownika, std::string haslo) {
 	query.append("SELECT IF((SELECT COUNT(*) FROM projektcpp.logowania WHERE (DATE(projektcpp.logowania.Data) BETWEEN DATE_ADD(NOW(),INTERVAL -1 DAY) AND NOW()) AND (projektcpp.logowania.Powodzenie = 0) GROUP BY projektcpp.logowania.UzytkownikID) >= ");
 	query.append(std::to_string(loginFailureLimit));
 	query.append(", -2, (SELECT IF(projektcpp.konta.Haslo = \"");
-	query.append(Szyfruj(haslo));
+	query.append(this->uzytkownik->Haslo());
 	query.append("\", 1, 0) AS SUKCES FROM projektcpp.konta WHERE projektcpp.konta.UzytkownikID = ");
-	query.append(id_uzytkownika);
+	query.append(this->uzytkownik->KlientID());
 	query.append(")) AS RESPONSE");
 	
 	const char* q = query.c_str();
@@ -55,7 +59,6 @@ int API::Logowanie(std::string id_uzytkownika, std::string haslo) {
 		res = mysql_store_result(this->conn);
 		row = mysql_fetch_row(res);
 	
-		MYSQL_ROW row2;
 		MYSQL_RES* res2;
 		std::string query2;
 		if (row == NULL) { //Niepoprawny login
@@ -63,7 +66,7 @@ int API::Logowanie(std::string id_uzytkownika, std::string haslo) {
 		}
 		if ((std::string)row[0] == "1") { //Poprawne dane logowania
 			query2.append("INSERT INTO projektcpp.logowania (projektcpp.logowania.UzytkownikID, projektcpp.logowania.Powodzenie) VALUES (");
-			query2.append(id_uzytkownika);
+			query2.append(this->uzytkownik->KlientID());
 			query2.append(",TRUE)");
 			const char* q2 = query2.c_str();
 			int qstate2 = mysql_query(this->conn, q2);
@@ -83,7 +86,7 @@ int API::Logowanie(std::string id_uzytkownika, std::string haslo) {
 		}
 		else { //Niepoprawne has³o
 			query2.append("INSERT INTO projektcpp.logowania (projektcpp.logowania.UzytkownikID, projektcpp.logowania.Powodzenie) VALUES (");
-			query2.append(id_uzytkownika);
+			query2.append(this->uzytkownik->KlientID());
 			query2.append(",FALSE)");
 			const char* q = query2.c_str();
 			int qstate2 = mysql_query(this->conn, q);
@@ -118,6 +121,7 @@ void API::PobierzWaluty() {
 	const char* q = query.c_str();
 	int qstate;
 	qstate = mysql_query(this->conn, q);
+	this->listaWalut.clear();
 	if (!qstate)
 	{
 		res = mysql_store_result(this->conn);
@@ -134,6 +138,110 @@ void API::PobierzWaluty() {
 
 // -------------------- Rachunki --------------------
 
+void API::UtworzNowyRachunek(std::string Nazwa, int RodzajID, int WalutaID) {
+	if (!this->isConnected()) { return; }
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	std::string query;
+	unsigned long nowyNumer = ((1.0f / (float)rand()) * 9999999999) + 1000000000;
+	query.append("SELECT ");
+	query.append(std::to_string(nowyNumer));
+	query.append(" IN (SELECT Numer FROM projektcpp.rachunki);");
+	const char* q = query.c_str();
+	int qstate;
+	qstate = mysql_query(this->conn, q);
+	if (!qstate)
+	{
+		res = mysql_store_result(this->conn);
+		row = mysql_fetch_row(res);
+
+		if (row == NULL) { //Niepoprawny login
+			return;
+		}
+		if ((std::string)row[0] == "1") {
+			this->UtworzNowyRachunek(Nazwa, RodzajID, WalutaID);
+			return;
+		}
+		else {
+			Rachunek nowyRachunek = Rachunek(std::to_string(nowyNumer), uzytkownik->KlientID(), Nazwa, RodzajID, WalutaID);
+			MYSQL_ROW row2;
+			MYSQL_RES* res2;
+			std::string query2;
+			query2.append("INSERT INTO projektcpp.rachunki (Numer, UzytkownikID, Nazwa, RodzajID, LimitDzienny, LimitMiesieczny, Saldo, WalutaID) VALUES (");
+			query2.append(nowyRachunek.Numer() + "," + nowyRachunek.UzytkownikID() + ",\"" + nowyRachunek.Nazwa() + "\"," + std::to_string(nowyRachunek.RodzajID()) + "," + std::to_string(nowyRachunek.LimitDzienny()) + "," + std::to_string(nowyRachunek.LimitMiesieczny()) + "," + std::to_string(nowyRachunek.Saldo()) + "," + std::to_string(nowyRachunek.WalutaID()) + ");");
+			const char* q2 = query2.c_str();
+			int qstate2;
+			qstate2 = mysql_query(this->conn, q2);
+			if (!qstate2)
+			{
+				res2 = mysql_store_result(this->conn);
+				return;
+			}
+			else
+			{
+				std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+				return;
+			}
+		}
+
+	}
+	else
+	{
+		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+		return;
+	}
+};
+
+void API::PobierzListeRachunkow() {
+	if (!this->isConnected()) { return; }
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	std::string query;
+	query.append("SELECT * FROM projektcpp.rachunki WHERE UzytkownikID = ");
+	query.append(uzytkownik->KlientID() + ";");
+	const char* q = query.c_str();
+	int qstate;
+	qstate = mysql_query(this->conn, q);
+	this->listaRachunkow.clear();
+	if (!qstate)
+	{
+		res = mysql_store_result(this->conn);
+		while (row = mysql_fetch_row(res)) {
+			this->listaRachunkow.push_front(Rachunek(row[1], row[2], row[3], atoi(row[4]), atof(row[5]), atof(row[6]), std::stod(row[7]), atoi(row[8])));
+		}
+	}
+	else
+	{
+		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+	}
+};
+
+void API::ZmienLimit(std::string Numer, float limit, bool CzyMiesieczny ) {
+	if (!this->isConnected()) { return; }
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	std::string query;
+	query.append("UPDATE projektcpp.rachunki SET ");
+	query.append(CzyMiesieczny ? "LimitMiesieczny = " : "LimitDzienny = ");
+	query.append(std::to_string(limit));
+	query.append(" WHERE Numer = ");
+	query.append(Numer + ";");
+	std::cout << query;
+	const char* q = query.c_str();
+	int qstate;
+	qstate = mysql_query(this->conn, q);
+	if (!qstate)
+	{
+		res = mysql_store_result(this->conn);
+		return;
+	}
+	else
+	{
+		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+		return;
+	}
+};
+
 // -------------------- Rodzaje rachunków --------------------
 
 void API::PobierzRodzajeRachunku() {
@@ -144,6 +252,41 @@ void API::PobierzRodzajeRachunku() {
 	const char* q = query.c_str();
 	int qstate;
 	qstate = mysql_query(this->conn, q);
+	this->listaRodzajiRachunkow.clear();
+	if (!qstate)
+	{
+		res = mysql_store_result(this->conn);
+		while (row = mysql_fetch_row(res)) {
+			this->listaRodzajiRachunkow.push_front(RodzajRachunku(atoi(row[0]), row[1], atof(row[2]), atof(row[3])));
+		}
+	}
+	else
+	{
+		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+	}
+};
+
+// -------------------- Operacje --------------------
+
+void API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, float kwota, std::string tytul) {
+	if (!this->isConnected()) { return; }
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	std::string query;
+	query.append("UPDATE projektcpp.rachunki SET Saldo = Saldo - ");
+	query.append(std::to_string(kwota));
+	query.append(" WHERE Numer = ");
+	query.append(numerNadawcy);
+	query.append("; UPDATE projektcpp.rachunki SET Saldo = Saldo + ");
+	query.append(std::to_string(kwota));
+	query.append(" WHERE Numer = ");
+	query.append(numerOdbiorcy + ";");
+	query.append("INSERT INTO projektcpp.operacje (NumerNadawcy, NumerOdbiorcy, Kwota, Tytu³) VALUES (");
+	query.append(numerNadawcy + ", " + numerOdbiorcy + ", " + std::to_string(kwota) + ", " + tytul + ");");
+	const char* q = query.c_str();
+	int qstate;
+	qstate = mysql_query(this->conn, q);
+	this->listaRodzajiRachunkow.clear();
 	if (!qstate)
 	{
 		res = mysql_store_result(this->conn);

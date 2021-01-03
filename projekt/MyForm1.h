@@ -1,8 +1,9 @@
 #pragma once
 #include <iostream>
 
+#include "MyForm3.h"
 #include "MyForm2.h"
-#include "MyForm.h"
+#include "MyForm1.h"
 
 namespace projekt {
 
@@ -20,8 +21,10 @@ namespace projekt {
 	{
 
 	public:
-		MyForm1(void)
+		System::Windows::Forms::Form^ loginForm;
+		MyForm1(System::Windows::Forms::Form^ login)
 		{
+			loginForm = login;
 			InitializeComponent();
 			//
 			//TODO: W tym miejscu dodaj kod konstruktora
@@ -128,11 +131,12 @@ namespace projekt {
 			// userIdLabel
 			// 
 			this->userIdLabel->AutoSize = true;
-			this->userIdLabel->Location = System::Drawing::Point(526, 15);
+			this->userIdLabel->Location = System::Drawing::Point(468, 16);
 			this->userIdLabel->Name = L"userIdLabel";
 			this->userIdLabel->RightToLeft = System::Windows::Forms::RightToLeft::No;
-			this->userIdLabel->Size = System::Drawing::Size(0, 13);
+			this->userIdLabel->Size = System::Drawing::Size(79, 13);
 			this->userIdLabel->TabIndex = 2;
+			this->userIdLabel->Text = L"U¿ytkownik ID:";
 			this->userIdLabel->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
 			// historiaPrzelewowListBox
@@ -200,6 +204,7 @@ namespace projekt {
 			// 
 			// zlecPrzelewBtn
 			// 
+			this->zlecPrzelewBtn->Enabled = false;
 			this->zlecPrzelewBtn->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 12, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(238)));
 			this->zlecPrzelewBtn->Location = System::Drawing::Point(13, 255);
@@ -208,6 +213,7 @@ namespace projekt {
 			this->zlecPrzelewBtn->TabIndex = 16;
 			this->zlecPrzelewBtn->Text = L"Zleæ przelew";
 			this->zlecPrzelewBtn->UseVisualStyleBackColor = true;
+			this->zlecPrzelewBtn->Click += gcnew System::EventHandler(this, &MyForm1::zlecPrzelewBtn_Click);
 			// 
 			// limitMiesiecznyBtn
 			// 
@@ -217,6 +223,7 @@ namespace projekt {
 			this->limitMiesiecznyBtn->TabIndex = 15;
 			this->limitMiesiecznyBtn->Text = L"Zmieñ";
 			this->limitMiesiecznyBtn->UseVisualStyleBackColor = true;
+			this->limitMiesiecznyBtn->Click += gcnew System::EventHandler(this, &MyForm1::limitMiesiecznyBtn_Click);
 			// 
 			// limitDziennyBtn
 			// 
@@ -226,9 +233,11 @@ namespace projekt {
 			this->limitDziennyBtn->TabIndex = 14;
 			this->limitDziennyBtn->Text = L"Zmieñ";
 			this->limitDziennyBtn->UseVisualStyleBackColor = true;
+			this->limitDziennyBtn->Click += gcnew System::EventHandler(this, &MyForm1::limitDziennyBtn_Click);
 			// 
 			// limitMiesiecznyTextBox
 			// 
+			this->limitMiesiecznyTextBox->Enabled = false;
 			this->limitMiesiecznyTextBox->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Regular,
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(238)));
 			this->limitMiesiecznyTextBox->Location = System::Drawing::Point(109, 213);
@@ -238,6 +247,7 @@ namespace projekt {
 			// 
 			// limitDziennyTextBox
 			// 
+			this->limitDziennyTextBox->Enabled = false;
 			this->limitDziennyTextBox->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Regular,
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(238)));
 			this->limitDziennyTextBox->Location = System::Drawing::Point(109, 177);
@@ -341,6 +351,7 @@ namespace projekt {
 			this->Controls->Add(this->wylogujBtn);
 			this->Name = L"MyForm1";
 			this->Text = L"Panel klienta";
+			this->Activated += gcnew System::EventHandler(this, &MyForm1::MyForm1_Activated);
 			this->Load += gcnew System::EventHandler(this, &MyForm1::MyForm1_Load);
 			this->groupBox1->ResumeLayout(false);
 			this->groupBox1->PerformLayout();
@@ -352,18 +363,137 @@ namespace projekt {
 #pragma endregion
 	private: System::Void comboBox1_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {
 		if (rachunkiComboBox->Text == "Utwórz nowy...") {
-			/*this->Hide();
-			MyForm2 nowyRachunek;
-			nowyRachunek.ShowDialog();*/
+			this->Hide();
+			MyForm2^ clientPanel = gcnew MyForm2(this);
+			auto result = clientPanel->ShowDialog();
+		}
+		else {
+			std::list<Rachunek>::iterator iter = API::Get().listaRachunkow.begin();
+			std::advance(iter, rachunkiComboBox->SelectedIndex);
+			Rachunek aktualnyRachunek = *iter;
+			std::list<RodzajRachunku>::iterator iter2 = API::Get().listaRodzajiRachunkow.begin();
+			std::advance(iter2, (aktualnyRachunek.RodzajID() - 1));
+			RodzajRachunku aktualnyRodzajRachunku = *iter2;
+			std::list<Waluta>::iterator iter3 = API::Get().listaWalut.begin();
+			std::advance(iter3, (aktualnyRachunek.WalutaID() - 1));
+			Waluta aktualnaWaluta = *iter3;
+			std::string saldo = std::to_string(aktualnyRachunek.Saldo());
+			saldoLabel->Text = gcnew String((saldo.substr(0, (saldo.length() - 4)) + " " + aktualnaWaluta.Nazwa()).c_str());
+			rodzajRachunkuLabel->Text = gcnew String(aktualnyRodzajRachunku.Nazwa().c_str());
+			std::string oprocentowanie = std::to_string(aktualnyRodzajRachunku.Oprocentowanie());
+			oprocentowanieLabel->Text = gcnew String((oprocentowanie.substr(0, (oprocentowanie.length() - 4)) + " %").c_str());
+			std::string kosztyMiesieczne = std::to_string(aktualnyRodzajRachunku.KosztyMiesieczne());
+			kosztyMiesieczneLabel->Text = gcnew String((kosztyMiesieczne.substr(0, (kosztyMiesieczne.length() - 4)) + " " + aktualnaWaluta.Nazwa()).c_str());
+			std::string limitDzienny = std::to_string(aktualnyRachunek.LimitDzienny());
+			limitDziennyTextBox->Text = gcnew String((limitDzienny.substr(0, (limitDzienny.length() - 4)) + " " + aktualnaWaluta.Nazwa()).c_str());
+			std::string limitMiesieczny = std::to_string(aktualnyRachunek.LimitMiesieczny());
+			limitMiesiecznyTextBox->Text = gcnew String((limitMiesieczny.substr(0, (limitMiesieczny.length() - 4)) + " " + aktualnaWaluta.Nazwa()).c_str());
+			limitDziennyBtn->Enabled = true;
+			limitMiesiecznyBtn->Enabled = true;
+			limitDziennyTextBox->Enabled = false;
+			limitMiesiecznyTextBox->Enabled = false;
+			limitDziennyBtn->Text = "Zmieñ";
+			limitMiesiecznyBtn->Text = "Zmieñ";
+			zlecPrzelewBtn->Enabled = true;
 		}
 	}
 	private: System::Void MyForm1_Load(System::Object^ sender, System::EventArgs^ e) {
+		API::Get().PobierzWaluty();
+		API::Get().PobierzRodzajeRachunku();
+		userIdLabel->Text = "U¿ytkownik ID:\n" + gcnew String(API::Get().uzytkownik->KlientID().c_str());
+	}
+	private: System::Void MyForm1_Activated(System::Object^ sender, System::EventArgs^ e) {
+		API::Get().PobierzListeRachunkow();
+		rachunkiComboBox->Items->Clear();
+		std::list<Rachunek>::iterator iter = API::Get().listaRachunkow.begin();
+		for (iter; iter != API::Get().listaRachunkow.end(); ++iter) {
+			Rachunek rachunek = *iter;
+			auto managed = gcnew String((rachunek.Numer() + "  |  " + rachunek.Nazwa()).c_str());
+			rachunkiComboBox->Items->Add(managed);
+		}
 		rachunkiComboBox->Items->Add("Utwórz nowy...");
+		saldoLabel->Text = "";
+		rodzajRachunkuLabel->Text = "";
+		oprocentowanieLabel->Text = "";
+		kosztyMiesieczneLabel->Text = "";
+		limitDziennyTextBox->Text = "";
+		limitMiesiecznyTextBox->Text = "";
+		limitDziennyBtn->Enabled = false;
+		limitMiesiecznyBtn->Enabled = false;
+		limitDziennyTextBox->Enabled = false;
+		limitMiesiecznyTextBox->Enabled = false;
+		limitDziennyBtn->Text = "Zmieñ";
+		limitMiesiecznyBtn->Text = "Zmieñ";
+		zlecPrzelewBtn->Enabled = false;
 	}
 	private: System::Void wylogujBtn_Click(System::Object^ sender, System::EventArgs^ e) {
-		/*this->Close();
-		MyForm logowanie;
-		logowanie.ShowDialog();*/
+		this->loginForm->Show();
+		this->Hide();
+	}
+	private: System::Void limitDziennyBtn_Click(System::Object^ sender, System::EventArgs^ e) {
+		limitDziennyTextBox->Enabled = !limitDziennyTextBox->Enabled;
+		if (limitDziennyTextBox->Enabled) {
+			limitDziennyBtn->Text = "Zapisz";
+		}
+		else
+		{
+			std::list<Rachunek>::iterator iter = API::Get().listaRachunkow.begin();
+			std::advance(iter, rachunkiComboBox->SelectedIndex);
+			Rachunek aktualnyRachunek = *iter;
+			std::list<Waluta>::iterator iter3 = API::Get().listaWalut.begin();
+			std::advance(iter3, (aktualnyRachunek.WalutaID() - 1));
+			Waluta aktualnaWaluta = *iter3;
+			char* end;
+			msclr::interop::marshal_context context;
+			std::string nowyLimit = context.marshal_as<std::string>(this->limitDziennyTextBox->Text);
+			float nowy = std::strtof(nowyLimit.c_str(), &end);
+			if (nowy < 0.0f || nowy > 10000.0f) {
+				::MessageBox(0, L"WprowadŸ wartoœæ z przedzia³u 0 - 10 000", L"Informacja", MB_ICONINFORMATION);
+				return;
+			}
+			aktualnyRachunek.AktualizujLimitDzienny(nowy);
+			std::string a = std::to_string(aktualnyRachunek.LimitDzienny());
+			limitDziennyTextBox->Text = gcnew String((a.substr(0, (a.length() - 4)) + " " + aktualnaWaluta.Nazwa()).c_str());
+			limitDziennyBtn->Text = "Zmieñ";
+		}
+	}
+	private: System::Void limitMiesiecznyBtn_Click(System::Object^ sender, System::EventArgs^ e) {
+		this->limitMiesiecznyTextBox->Enabled = !this->limitMiesiecznyTextBox->Enabled;
+		if (this->limitMiesiecznyTextBox->Enabled) {
+			this->limitMiesiecznyBtn->Text = "Zapisz";
+		}
+		else
+		{
+			std::list<Rachunek>::iterator iter = API::Get().listaRachunkow.begin();
+			std::advance(iter, rachunkiComboBox->SelectedIndex);
+			Rachunek aktualnyRachunek = *iter;
+			std::list<Waluta>::iterator iter3 = API::Get().listaWalut.begin();
+			std::advance(iter3, (aktualnyRachunek.WalutaID() - 1));
+			Waluta aktualnaWaluta = *iter3;
+			char* end;
+			msclr::interop::marshal_context context;
+			std::string nowyLimit = context.marshal_as<std::string>(this->limitMiesiecznyTextBox->Text);
+			float nowy = std::strtof(nowyLimit.c_str(), &end);
+			if (nowy < 0.0f || nowy > 50000.0f) {
+				::MessageBox(0, L"WprowadŸ wartoœæ z przedzia³u 0 - 50 000", L"Informacja", MB_ICONINFORMATION);
+				return;
+			}
+			aktualnyRachunek.AktualizujLimitMiesieczny(nowy);
+			std::string a = std::to_string(aktualnyRachunek.LimitMiesieczny());
+			limitMiesiecznyTextBox->Text = gcnew String((a.substr(0, (a.length() - 4)) + " " + aktualnaWaluta.Nazwa()).c_str());
+			this->limitMiesiecznyBtn->Text = "Zmieñ";
+		}
+	}
+	private: System::Void zlecPrzelewBtn_Click(System::Object^ sender, System::EventArgs^ e) {
+		std::list<Rachunek>::iterator iter = API::Get().listaRachunkow.begin();
+		std::advance(iter, rachunkiComboBox->SelectedIndex);
+		Rachunek aktualnyRachunek = *iter;
+		std::list<Waluta>::iterator iter3 = API::Get().listaWalut.begin();
+		std::advance(iter3, (aktualnyRachunek.WalutaID() - 1));
+		Waluta aktualnaWaluta = *iter3;
+		this->Hide();
+		MyForm3^ przelewPanel = gcnew MyForm3(this, &aktualnyRachunek, &aktualnaWaluta);
+		auto result = przelewPanel->ShowDialog();
 	}
 };
 }

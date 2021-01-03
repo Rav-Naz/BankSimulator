@@ -1,31 +1,23 @@
-#include "Konto.h"
 #include <iostream>
+#include <string>
 
-Konto::Konto(int Klient, char* Haslo, int ID = 0) {
-	this->_id = ID;
-	this->_klient = Klient;
+#include "Konto.h"
+#include "Szyfracja.h"
+
+Konto::Konto(std::string KlientID, std::string Haslo) {
+	this->_klientId = KlientID;
 	this->_haslo = this->SzyfrujHaslo(Haslo);
 };
-Konto::~Konto() {
-	delete this;
-};
 
-int Konto::ID() {
-	return this->_id;
+std::string Konto::KlientID() {
+	return this->_klientId;
 };
-int Konto::Klient() {
-	return this->_klient;
-};
-char* Konto::Haslo() {
+std::string Konto::Haslo() {
 	return this->_haslo;
 };
 
-char* Konto::SzyfrujHaslo(char* haslo) {
+std::string Konto::SzyfrujHaslo(std::string Haslo) {
 
-	for (size_t i = 0; (i < strlen(haslo) && haslo[i] != '\0'); i++) {
-		haslo[i] = (char)haslo[i] + 2;
-	}
-
-	return haslo;
+	return Szyfruj(Haslo);
 
 };

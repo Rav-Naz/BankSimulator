@@ -1,10 +1,14 @@
-#pragma once
+ï»¿#pragma once
+
 #include <msclr\marshal_cppstd.h>
 
 #include "API.h"
 #include "Logowanie.h"
+#include "Konto.h"
+
 #include "MyForm1.h"
-#include "MyForm2.h"
+#include "MyForm.h"
+
 
 namespace projekt {
 
@@ -31,7 +35,7 @@ namespace projekt {
 
 	protected:
 		/// <summary>
-		/// Wyczyœæ wszystkie u¿ywane zasoby.
+		/// WyczyÅ›Ä‡ wszystkie uÅ¼ywane zasoby.
 		/// </summary>
 		~MyForm()
 		{
@@ -44,10 +48,12 @@ namespace projekt {
 	protected:
 
 	protected:
-	private: System::Windows::Forms::Label^ label1;
-	private: System::Windows::Forms::Label^ label2;
+
+
 	private: System::Windows::Forms::TextBox^ hasloTextBox;
 	private: System::Windows::Forms::Button^ zalogujBtn;
+	private: System::Windows::Forms::GroupBox^ groupBox1;
+	private: System::Windows::Forms::GroupBox^ groupBox2;
 
 	protected:
 
@@ -65,48 +71,32 @@ namespace projekt {
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
-		/// Metoda wymagana do obs³ugi projektanta — nie nale¿y modyfikowaæ
-		/// jej zawartoœci w edytorze kodu.
+		/// Metoda wymagana do obsÅ‚ugi projektanta â€” nie naleÅ¼y modyfikowaÄ‡
+		/// jej zawartoÅ›ci w edytorze kodu.
 		/// </summary>
 		void InitializeComponent(void)
 		{
 			this->loginTextBox = (gcnew System::Windows::Forms::TextBox());
-			this->label1 = (gcnew System::Windows::Forms::Label());
-			this->label2 = (gcnew System::Windows::Forms::Label());
 			this->hasloTextBox = (gcnew System::Windows::Forms::TextBox());
 			this->zalogujBtn = (gcnew System::Windows::Forms::Button());
+			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
+			this->groupBox1->SuspendLayout();
+			this->groupBox2->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// loginTextBox
 			// 
-			this->loginTextBox->Location = System::Drawing::Point(43, 57);
+			this->loginTextBox->Location = System::Drawing::Point(13, 19);
 			this->loginTextBox->MaxLength = 6;
 			this->loginTextBox->Name = L"loginTextBox";
 			this->loginTextBox->Size = System::Drawing::Size(186, 20);
 			this->loginTextBox->TabIndex = 0;
 			// 
-			// label1
-			// 
-			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(40, 41);
-			this->label1->Name = L"label1";
-			this->label1->Size = System::Drawing::Size(82, 13);
-			this->label1->TabIndex = 1;
-			this->label1->Text = L"ID U¿ytkownika";
-			// 
-			// label2
-			// 
-			this->label2->AutoSize = true;
-			this->label2->Location = System::Drawing::Point(40, 107);
-			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(36, 13);
-			this->label2->TabIndex = 3;
-			this->label2->Text = L"Has³o";
-			// 
 			// hasloTextBox
 			// 
 			this->hasloTextBox->BackColor = System::Drawing::SystemColors::Window;
-			this->hasloTextBox->Location = System::Drawing::Point(43, 123);
+			this->hasloTextBox->Location = System::Drawing::Point(13, 19);
 			this->hasloTextBox->Name = L"hasloTextBox";
 			this->hasloTextBox->PasswordChar = '*';
 			this->hasloTextBox->Size = System::Drawing::Size(186, 20);
@@ -117,7 +107,7 @@ namespace projekt {
 			this->zalogujBtn->BackColor = System::Drawing::SystemColors::ControlDarkDark;
 			this->zalogujBtn->FlatStyle = System::Windows::Forms::FlatStyle::System;
 			this->zalogujBtn->ForeColor = System::Drawing::SystemColors::ControlText;
-			this->zalogujBtn->Location = System::Drawing::Point(79, 178);
+			this->zalogujBtn->Location = System::Drawing::Point(67, 133);
 			this->zalogujBtn->Name = L"zalogujBtn";
 			this->zalogujBtn->Size = System::Drawing::Size(113, 38);
 			this->zalogujBtn->TabIndex = 4;
@@ -125,22 +115,43 @@ namespace projekt {
 			this->zalogujBtn->UseVisualStyleBackColor = false;
 			this->zalogujBtn->Click += gcnew System::EventHandler(this, &MyForm::zalogujBtn_Click);
 			// 
+			// groupBox1
+			// 
+			this->groupBox1->Controls->Add(this->loginTextBox);
+			this->groupBox1->Location = System::Drawing::Point(19, 12);
+			this->groupBox1->Name = L"groupBox1";
+			this->groupBox1->Size = System::Drawing::Size(210, 53);
+			this->groupBox1->TabIndex = 5;
+			this->groupBox1->TabStop = false;
+			this->groupBox1->Text = L"ID UÅ¼ytkownika";
+			// 
+			// groupBox2
+			// 
+			this->groupBox2->Controls->Add(this->hasloTextBox);
+			this->groupBox2->Location = System::Drawing::Point(19, 71);
+			this->groupBox2->Name = L"groupBox2";
+			this->groupBox2->Size = System::Drawing::Size(210, 56);
+			this->groupBox2->TabIndex = 6;
+			this->groupBox2->TabStop = false;
+			this->groupBox2->Text = L"HasÅ‚o";
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
-			this->ClientSize = System::Drawing::Size(271, 257);
+			this->ClientSize = System::Drawing::Size(248, 189);
+			this->Controls->Add(this->groupBox2);
+			this->Controls->Add(this->groupBox1);
 			this->Controls->Add(this->zalogujBtn);
-			this->Controls->Add(this->label2);
-			this->Controls->Add(this->hasloTextBox);
-			this->Controls->Add(this->label1);
-			this->Controls->Add(this->loginTextBox);
 			this->Name = L"MyForm";
 			this->Text = L"Logowanie";
 			this->Load += gcnew System::EventHandler(this, &MyForm::MyForm_Load);
+			this->groupBox1->ResumeLayout(false);
+			this->groupBox1->PerformLayout();
+			this->groupBox2->ResumeLayout(false);
+			this->groupBox2->PerformLayout();
 			this->ResumeLayout(false);
-			this->PerformLayout();
 
 		}
 #pragma endregion
@@ -149,28 +160,35 @@ namespace projekt {
 	}
 	private: System::Void zalogujBtn_Click(System::Object^ sender, System::EventArgs^ e) {
 		
+		API::Get().uzytkownik = new Konto("662347","Password");
 		this->Hide();
-		MyForm1 form1;
+		MyForm1^ clientPanel = gcnew MyForm1(this);
+		auto result = clientPanel->ShowDialog();
+		return;
 
 		msclr::interop::marshal_context context;
-		Logowanie* logowanie = new Logowanie(context.marshal_as<std::string>(this->loginTextBox->Text), context.marshal_as<std::string>(this->hasloTextBox->Text));
-
-		if (logowanie->Powodzenie() == 1) { //pomyœlne logowanie
-			/*this->Hide();
-			MyForm1 pulpitKlienta;
-			pulpitKlienta.ShowDialog();*/
-		} 
-		else if (logowanie->Powodzenie() == 0) { //b³êdne has³o
-			::MessageBox(0, L"Podano b³êdne has³o. Po 3 nieudanych próbach logowania, dostêp do konta zostanie czasowo zablokowany.", L"Uwaga", MB_ICONWARNING);
+		std::string uzytkownikId = context.marshal_as<std::string>(this->loginTextBox->Text);
+		if (uzytkownikId.length() != 6) {
+			::MessageBox(0, L"Niepoprawny identyfikator uÅ¼ytkownika", L"Uwaga", MB_ICONWARNING);
+			return;
 		}
-		else if (logowanie->Powodzenie() == -1) { //brak u¿ytkownika
-			::MessageBox(0, L"U¿ytkownik o podanym ID nie istnieje", L"Uwaga", MB_ICONWARNING);
+		Logowanie* logowanie = new Logowanie(uzytkownikId, context.marshal_as<std::string>(this->hasloTextBox->Text));
+		if (logowanie->Powodzenie() == 1) { //pomyÅ›lne logowanie
+			this->Hide();
+			MyForm1^ clientPanel = gcnew MyForm1(this);
+			auto result = clientPanel->ShowDialog();
+		} 
+		else if (logowanie->Powodzenie() == 0) { //bÅ‚Ä™dne hasÅ‚o
+			::MessageBox(0, L"Podano bÅ‚Ä™dne hasÅ‚o. Po 3 nieudanych prÃ³bach logowania, dostÄ™p do konta zostanie czasowo zablokowany.", L"Uwaga", MB_ICONWARNING);
+		}
+		else if (logowanie->Powodzenie() == -1) { //brak uÅ¼ytkownika
+			::MessageBox(0, L"UÅ¼ytkownik o podanym ID nie istnieje", L"Uwaga", MB_ICONWARNING);
 		}
 		else if (logowanie->Powodzenie() == -2) { //zablokowanie logowania
-			::MessageBox(0, L"Mo¿liwoœæ logowania do Twojego konta zosta³a zablokowana, z powodu 3-krotnego podania b³êdnego has³a. Kolejn¹ próbê mo¿esz podj¹æ po 24 godzinach od pierwszego nieduanego logowania", L"B³¹d", MB_ICONERROR);
+			::MessageBox(0, L"MoÅ¼liwoÅ›Ä‡ logowania do Twojego konta zostaÅ‚a zablokowana, z powodu 3-krotnego podania bÅ‚Ä™dnego hasÅ‚a. KolejnÄ… prÃ³bÄ™ moÅ¼esz podjÄ…Ä‡ po 24 godzinach od pierwszego nieduanego logowania", L"BÅ‚Ä…d", MB_ICONERROR);
 		}
 		else {
-			::MessageBox(0, L"Napotkano nieoczekiwany b³¹d. Spróbuj ponownie póŸniej", L"B³¹d", MB_ICONERROR);
+			::MessageBox(0, L"Napotkano nieoczekiwany bÅ‚Ä…d. SprÃ³buj ponownie pÃ³Åºniej", L"BÅ‚Ä…d", MB_ICONERROR);
 		}
 
 	}

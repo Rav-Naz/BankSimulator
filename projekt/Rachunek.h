@@ -1,29 +1,32 @@
 #pragma once
+#include <string>
 class Rachunek
 {
 private:
-	int _numer;
-	int _uzytkownikID;
-	char* _nazwa;
+	std::string _numer;
+	std::string _uzytkownikID;
+	std::string _nazwa;
 	int _rodzajID;
 	float _limitDzienny;
 	float _limitMiesieczny;
 	double _saldo;
 	int _walutaID;
 public:
-	Rachunek(int Numer, int Uzytkownik);
-	Rachunek(int Numer, int UzytkownikID, char* Nazwa, int RodzajID, float LimitDzienny, float LimitMiesieczny, double Saldo, int WalutaID);
+	Rachunek(std::string Numer, std::string UzytkownikID);
+	Rachunek(std::string Numer, std::string UzytkownikID, std::string Nazwa, int RodzajID, int WalutaID);
+	Rachunek(std::string Numer, std::string UzytkownikID, std::string Nazwa, int RodzajID, float LimitDzienny, float LimitMiesieczny, double Saldo, int WalutaID);
 	Rachunek(Rachunek& Wzor);
-	~Rachunek();
 
-	int Numer();
-	int UzytkownikID();
-	char* Nazwa();
+	std::string Numer();
+	std::string UzytkownikID();
+	std::string Nazwa();
 	int RodzajID();
 	float LimitDzienny();
 	float LimitMiesieczny();
 	double Saldo();
 	int WalutaID();
 
+	void AktualizujLimitDzienny(float limit);
+	void AktualizujLimitMiesieczny(float limit);
 };
 

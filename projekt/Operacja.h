@@ -1,24 +1,20 @@
 #pragma once
-#include <ctime>
+#include <string>
 class Operacja
 {
 private:
-	int _id;
 	int _numerNadawcy;
 	int _numerOdbiorcy;
-	time_t _data;
+	std::string _data;
 	float _kwota;
-	bool _zrealizowane;
 
 public:
-	Operacja(int numerNadawcy, int numerOdbiorcy, float Kwota, int ID);
-	~Operacja();
+	Operacja(int NumerNadawcy, int NumerOdbiorcy, float Kwota);
+	Operacja(int NumerNadawcy, int NumerOdbiorcy, float Kwota, std::string Data);
 
-	int ID();
 	int NumerNadawcy();
 	int NumerOdbiorcy();
-	time_t Data();
+	std::string Data();
 	float Kwota();
-	bool Zrealizowane();
 };
 

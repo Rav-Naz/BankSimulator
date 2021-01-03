@@ -1,7 +1,8 @@
 #include <string>
 #include <mysql.h>
 #include <iostream>
-#include <locale.h>
+#include <cstdlib> 
+#include <ctime> 
 
 #include "MyForm.h"
 #include "Waluta.h"
@@ -13,6 +14,7 @@ using namespace System::Windows::Forms;
 
 void main(array<String^>^ args) {
 	//setlocale(LC_ALL, "pl-PL");
+	srand((unsigned)time(0));
 	API::Get().InitDB("localhost", "root", "password", "projektcpp", 3307);
 	Application::SetCompatibleTextRenderingDefault(false);
 	Application::EnableVisualStyles();

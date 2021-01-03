@@ -1,19 +1,17 @@
 #pragma once
+#include <string>
 
 class Konto
 {
 private:
-	int _id;
-	char* _haslo;
-	int _klient;
+	std::string _klientId;
+	std::string _haslo;
 public:
-	Konto(int Klient, char* Haslo, int ID);
-	~Konto();
+	Konto(std::string KlientID, std::string Haslo);
 
-	int ID();
-	int Klient();
-	char* Haslo();
+	std::string KlientID();
+	std::string Haslo();
 
-	char* SzyfrujHaslo(char* Haslo);
+	std::string SzyfrujHaslo(std::string Haslo);
 };
 

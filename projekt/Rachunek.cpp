@@ -1,6 +1,8 @@
 #include "Rachunek.h"
+#include "API.h"
+#include <string>
 
-Rachunek::Rachunek(int Numer, int UzytkownikID) {
+Rachunek::Rachunek(std::string Numer, std::string UzytkownikID) {
 	this->_numer = Numer;
 	this->_uzytkownikID = UzytkownikID;
 	this->_nazwa = "Rachunek Oszczêdnoœciowo-Rozliczeniowy";
@@ -10,7 +12,17 @@ Rachunek::Rachunek(int Numer, int UzytkownikID) {
 	this->_saldo = 0.0;
 	this->_walutaID = 1;
 };
-Rachunek::Rachunek(int Numer, int UzytkownikID, char* Nazwa, int RodzajID, float LimitDzienny, float LimitMiesieczny, double Saldo, int WalutaID) {
+Rachunek::Rachunek(std::string Numer, std::string UzytkownikID, std::string Nazwa, int RodzajID, int WalutaID) {
+	this->_numer = Numer;
+	this->_uzytkownikID = UzytkownikID;
+	this->_nazwa = Nazwa;
+	this->_rodzajID = RodzajID;
+	this->_limitDzienny = 50.0f;
+	this->_limitMiesieczny = 1000.0f;
+	this->_saldo = 0.0;
+	this->_walutaID = WalutaID;
+};
+Rachunek::Rachunek(std::string Numer, std::string UzytkownikID, std::string Nazwa, int RodzajID, float LimitDzienny, float LimitMiesieczny, double Saldo, int WalutaID) {
 	this->_numer = Numer;
 	this->_uzytkownikID = UzytkownikID;
 	this->_nazwa = Nazwa;
@@ -30,17 +42,13 @@ Rachunek::Rachunek(Rachunek& Wzor) {
 	this->_saldo = Wzor.Saldo();
 	this->_walutaID = Wzor.WalutaID();
 };
-Rachunek::~Rachunek() {
-	delete this;
-};
-
-int Rachunek::Numer() {
+std::string Rachunek::Numer() {
 	return this->_numer;
 };
-int Rachunek::UzytkownikID() {
+std::string Rachunek::UzytkownikID() {
 	return this->_uzytkownikID;
 };
-char* Rachunek::Nazwa() {
+std::string Rachunek::Nazwa() {
 	return this->_nazwa;
 };
 int Rachunek::RodzajID() {
@@ -58,3 +66,12 @@ double Rachunek::Saldo() {
 int Rachunek::WalutaID() {
 	return this->_walutaID;
 };
+
+void Rachunek::AktualizujLimitDzienny(float limit) {
+	this->_limitDzienny = limit;
+	API::Get().ZmienLimit(this->_numer, this->_limitDzienny, false);
+}
+void Rachunek::AktualizujLimitMiesieczny(float limit) {
+	this->_limitMiesieczny = limit;
+	API::Get().ZmienLimit(this->_numer, this->_limitMiesieczny, true);
+}

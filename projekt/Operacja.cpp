@@ -1,16 +1,17 @@
 #include "Operacja.h"
-#include <ctime>
 
-Operacja::Operacja(int numerNadawcy, int numerOdbiorcy, float Kwota, int ID = 0) {
-	this->_id = ID;
-	this->_numerNadawcy = numerNadawcy;
-	this->_numerOdbiorcy = numerOdbiorcy;
-	this->_data = time(0);
+Operacja::Operacja(int NumerNadawcy, int NumerOdbiorcy, float Kwota) {
+	this->_numerNadawcy = NumerNadawcy;
+	this->_numerOdbiorcy = NumerOdbiorcy;
+	this->_data = "null";
 	this->_kwota = Kwota;
-	this->_zrealizowane = false;
 };
-Operacja::~Operacja() {
-	delete this;
+
+Operacja::Operacja(int NumerNadawcy, int NumerOdbiorcy, float Kwota, std::string Data) {
+	this->_numerNadawcy = NumerNadawcy;
+	this->_numerOdbiorcy = NumerOdbiorcy;
+	this->_data = Data;
+	this->_kwota = Kwota;
 };
 
 int Operacja::NumerNadawcy() {
@@ -19,12 +20,9 @@ int Operacja::NumerNadawcy() {
 int Operacja::NumerOdbiorcy() {
 	return this->_numerOdbiorcy;
 };
-time_t Operacja::Data() {
+std::string Operacja::Data() {
 	return this->_data;
 };
 float Operacja::Kwota() {
 	return this->_kwota;
-};
-bool Operacja::Zrealizowane() {
-	return this->_zrealizowane;
 };
