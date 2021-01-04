@@ -34,11 +34,11 @@ public:
 	// Rachunki
 	void UtworzNowyRachunek(std::string Nazwa, int RodzajID, int WalutaID);
 	void PobierzListeRachunkow();
-	void ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, float kwota, std::string tytul);
+	void ZmienLimit(std::string Numer, float limit, bool CzyMiesieczny);
 	// Rodzaj rachunku
 	void PobierzRodzajeRachunku();
 	// Operacje
-	void ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, float kwota);
+	int ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::string kwota, std::string tytul);
 
 private:
 	API() {};

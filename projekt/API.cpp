@@ -237,7 +237,7 @@ void API::ZmienLimit(std::string Numer, float limit, bool CzyMiesieczny ) {
 	}
 	else
 	{
-		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+		std::cout << "Query failed: " << mysql_error(this->conn) << std::endl;
 		return;
 	}
 };
@@ -268,34 +268,38 @@ void API::PobierzRodzajeRachunku() {
 
 // -------------------- Operacje --------------------
 
-void API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, float kwota, std::string tytul) {
-	if (!this->isConnected()) { return; }
-	MYSQL_ROW row;
+int API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::string kwota, std::string tytul) {
+	if (!this->isConnected()) { return 0; }
 	MYSQL_RES* res;
+	MYSQL_ROW row;
 	std::string query;
-	query.append("UPDATE projektcpp.rachunki SET Saldo = Saldo - ");
-	query.append(std::to_string(kwota));
-	query.append(" WHERE Numer = ");
-	query.append(numerNadawcy);
-	query.append("; UPDATE projektcpp.rachunki SET Saldo = Saldo + ");
-	query.append(std::to_string(kwota));
-	query.append(" WHERE Numer = ");
-	query.append(numerOdbiorcy + ";");
-	query.append("INSERT INTO projektcpp.operacje (NumerNadawcy, NumerOdbiorcy, Kwota, Tytu³) VALUES (");
-	query.append(numerNadawcy + ", " + numerOdbiorcy + ", " + std::to_string(kwota) + ", " + tytul + ");");
+	std::string query1;
+	std::string query2;
+	std::string query3;
+	query.append("SELECT " + numerOdbiorcy + " IN (SELECT Numer FROM projektcpp.rachunki) AS Istnieje;");
 	const char* q = query.c_str();
-	int qstate;
-	qstate = mysql_query(this->conn, q);
-	this->listaRodzajiRachunkow.clear();
+	int qstate = mysql_query(this->conn, q);
 	if (!qstate)
 	{
 		res = mysql_store_result(this->conn);
-		while (row = mysql_fetch_row(res)) {
-			this->listaRodzajiRachunkow.push_front(RodzajRachunku(atoi(row[0]), row[1], atof(row[2]), atof(row[3])));
+		row = mysql_fetch_row(res);
+		if ((std::string)row[0] == "0") { // Taki numer rachunku nie istnieje
+			return -1;
 		}
 	}
 	else
 	{
 		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+		return 0;
 	}
+	query1.append("UPDATE projektcpp.rachunki SET Saldo = Saldo - " + kwota + " WHERE Numer = " + numerNadawcy + ";" );
+	query2.append("UPDATE projektcpp.rachunki SET Saldo = Saldo + (" + kwota + " * (SELECT(PrzelicznikNadawcy.Przelicznik / PrzelicznikOdbiorcy.Przelicznik) AS Przelicznik FROM(SELECT Przelicznik FROM projektcpp.rachunki LEFT JOIN projektcpp.waluty ON projektcpp.rachunki.WalutaID = projektcpp.waluty.ID WHERE projektcpp.rachunki.Numer = " + numerNadawcy + " LIMIT 1) AS PrzelicznikNadawcy, (SELECT Przelicznik FROM projektcpp.rachunki LEFT JOIN projektcpp.waluty ON projektcpp.rachunki.WalutaID = projektcpp.waluty.ID WHERE projektcpp.rachunki.Numer = " + numerOdbiorcy + " LIMIT 1) AS PrzelicznikOdbiorcy)) WHERE Numer = " + numerOdbiorcy + ";");
+	query3.append("INSERT INTO projektcpp.operacje(NumerNadawcy, NumerOdbiorcy, Kwota, Tytul) VALUES(" + numerNadawcy + ", " + numerOdbiorcy + ", " + kwota +", \" " + tytul +"\");");
+	const char* q1 = query1.c_str();
+	const char* q2 = query2.c_str();
+	const char* q3 = query3.c_str();
+    mysql_query(this->conn, q1);;
+	mysql_query(this->conn, q2);
+	mysql_query(this->conn, q3);
+	return 1;
 };

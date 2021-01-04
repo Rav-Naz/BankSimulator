@@ -1,7 +1,12 @@
 #pragma once
 #include "Rachunek.h"
 #include "Waluta.h"
+#include "API.h"
+
 #include <iostream>
+#include <list>
+#include <msclr\marshal_cppstd.h>
+
 namespace projekt {
 
 	using namespace System;
@@ -166,6 +171,7 @@ namespace projekt {
 			this->numerRachunkuTextBox->Name = L"numerRachunkuTextBox";
 			this->numerRachunkuTextBox->Size = System::Drawing::Size(210, 20);
 			this->numerRachunkuTextBox->TabIndex = 0;
+			this->numerRachunkuTextBox->MaxLength = 10;
 			// 
 			// textBox2
 			// 
@@ -173,6 +179,7 @@ namespace projekt {
 			this->kwotaTextBox->Name = L"kwotaTextBox";
 			this->kwotaTextBox->Size = System::Drawing::Size(210, 20);
 			this->kwotaTextBox->TabIndex = 0;
+			this->kwotaTextBox->MaxLength = 10;
 			// 
 			// textBox3
 			// 
@@ -180,6 +187,7 @@ namespace projekt {
 			this->tytulTextBox->Name = L"tytulTextBox";
 			this->tytulTextBox->Size = System::Drawing::Size(210, 20);
 			this->tytulTextBox->TabIndex = 0;
+			this->tytulTextBox->MaxLength = 50;
 			// 
 			// MyForm3
 			// 
@@ -218,11 +226,46 @@ namespace projekt {
 		this->Close();
 	}
 	private: System::Void wykonajBtn_Click(System::Object^ sender, System::EventArgs^ e) {
+		Rachunek rachunek = *wybranyRachunek;
 		char* end;
 		msclr::interop::marshal_context context;
+		std::string numerOdbiocy = context.marshal_as<std::string>(this->numerRachunkuTextBox->Text);
+		std::string tytul = context.marshal_as<std::string>(this->tytulTextBox->Text);
 		std::string kwota = context.marshal_as<std::string>(this->kwotaTextBox->Text);
-		kwota = kwota.substr(0, (kwota.length() - 4));
 		float nowy = std::strtof(kwota.c_str(), &end);
+		if (rachunek.Saldo() < nowy) {
+			::MessageBox(0, L"Zbyt ma³o œrodków", L"Uwaga", MB_ICONWARNING);
+			return;
+		}
+		if (nowy == 0.0f) {
+			::MessageBox(0, L"WprowadŸ poprawn¹ kwotê", L"Uwaga", MB_ICONWARNING);
+			return;
+		}
+		if (numerOdbiocy == rachunek.Numer()) {
+			::MessageBox(0, L"Nie mo¿esz wykonaæ przelewu na ten sam rachunek", L"Uwaga", MB_ICONWARNING);
+			return;
+		}
+		if (numerOdbiocy.length() != 10) {
+			::MessageBox(0, L"Niepoprawny numer rachunku", L"Uwaga", MB_ICONWARNING);
+			return;
+		}
+		if (tytul.length() < 1) {
+			::MessageBox(0, L"Wpisz tytu³", L"Uwaga", MB_ICONWARNING);
+			return;
+		}
+		kwota = std::to_string(nowy).substr(0, (std::to_string(nowy).length() - 4));
+		int result = API::Get().ZlecPrzelew(rachunek.Numer(), numerOdbiocy, kwota, tytul);
+
+		if (result == 0) {
+			::MessageBox(0, L"Napotkano nieoczekiwany b³¹d. Spróbuj ponownie póŸniej", L"B³¹d", MB_ICONERROR);
+			return;
+		}
+		else if (result == -1) {
+			::MessageBox(0, L"Numer rachunku odbiorcy nie istnieje", L"Uwaga", MB_ICONWARNING);
+			return;
+		}
+		this->clientPanelForm->Show();
+		this->Close();
 	}
 };
 }
