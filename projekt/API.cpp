@@ -226,7 +226,6 @@ void API::ZmienLimit(std::string Numer, float limit, bool CzyMiesieczny ) {
 	query.append(std::to_string(limit));
 	query.append(" WHERE Numer = ");
 	query.append(Numer + ";");
-	std::cout << query;
 	const char* q = query.c_str();
 	int qstate;
 	qstate = mysql_query(this->conn, q);
@@ -276,6 +275,8 @@ int API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::s
 	std::string query1;
 	std::string query2;
 	std::string query3;
+	std::string query4;
+	std::string query5;
 	query.append("SELECT " + numerOdbiorcy + " IN (SELECT Numer FROM projektcpp.rachunki) AS Istnieje;");
 	const char* q = query.c_str();
 	int qstate = mysql_query(this->conn, q);
@@ -285,6 +286,42 @@ int API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::s
 		row = mysql_fetch_row(res);
 		if ((std::string)row[0] == "0") { // Taki numer rachunku nie istnieje
 			return -1;
+		}
+	}
+	else
+	{
+		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+		return 0;
+	}
+	MYSQL_RES* res4;
+	MYSQL_ROW row4;
+	query4.append("SELECT IF( (IF(Suma.Suma IS NULL, 0, Suma.Suma) + " + kwota + ") > Limity.LimitDzienny,1,0) AS Przekroczony FROM (SELECT SUM(Kwota) AS Suma FROM projektcpp.operacje WHERE NumerNadawcy = " + numerNadawcy + " AND DATE(DataWykonania) = CURDATE()) AS Suma, (SELECT LimitDzienny FROM projektcpp.rachunki WHERE Numer = " + numerNadawcy + ") AS Limity;");
+	const char* q4 = query4.c_str();
+	int qstate4 = mysql_query(this->conn, q4);
+	if (!qstate4)
+	{
+		res4 = mysql_store_result(this->conn);
+		row4 = mysql_fetch_row(res4);
+		if ((std::string)row4[0] == "1") { // Przekroczono limit dzienny
+			return -2;
+		}
+	}
+	else
+	{
+		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+		return 0;
+	}
+	MYSQL_RES* res5;
+	MYSQL_ROW row5;
+	query5.append("SELECT IF((IF(Suma.Suma IS NULL, 0, Suma.Suma) + " + kwota + ") > Limity.LimitMiesieczny,1,0) AS Przekroczony FROM (SELECT SUM(Kwota) AS Suma FROM projektcpp.operacje, (SELECT DATE(CONCAT(SUBSTRING(CURDATE(), 1, 7),\"-01\")) AS Start, ADDDATE(DATE(CONCAT(SUBSTRING(CURDATE(), 1, 7),\"-01\")), INTERVAL 1 MONTH) AS End) AS Daty WHERE NumerNadawcy = " + numerNadawcy + " AND DATE(DataWykonania) >= Daty.Start AND DATE(DataWykonania) < Daty.End) AS Suma, (SELECT LimitMiesieczny FROM projektcpp.rachunki WHERE Numer = " + numerNadawcy + ") AS Limity;");
+	const char* q5 = query5.c_str();
+	int qstate5 = mysql_query(this->conn, q5);
+	if (!qstate5)
+	{
+		res5 = mysql_store_result(this->conn);
+		row5 = mysql_fetch_row(res5);
+		if ((std::string)row5[0] == "1") { // Przekroczono limit miesieczny
+			return -3;
 		}
 	}
 	else

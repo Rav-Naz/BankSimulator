@@ -264,6 +264,14 @@ namespace projekt {
 			::MessageBox(0, L"Numer rachunku odbiorcy nie istnieje", L"Uwaga", MB_ICONWARNING);
 			return;
 		}
+		else if (result == -2) {
+			::MessageBox(0, L"Przekroczono limit dzienny", L"Uwaga", MB_ICONWARNING);
+			return;
+		}
+		else if (result == -3) {
+			::MessageBox(0, L"Przekroczono limit miesiêczny", L"Uwaga", MB_ICONWARNING);
+			return;
+		}
 		this->clientPanelForm->Show();
 		this->Close();
 	}
