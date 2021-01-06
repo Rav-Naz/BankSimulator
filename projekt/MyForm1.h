@@ -46,7 +46,7 @@ namespace projekt {
 	protected:
 	private: System::Windows::Forms::Button^ wylogujBtn;
 	private: System::Windows::Forms::Label^ userIdLabel;
-	private: System::Windows::Forms::ListBox^ historiaPrzelewowListBox;
+
 	private: System::Windows::Forms::GroupBox^ groupBox1;
 	private: System::Windows::Forms::Label^ kosztyMiesieczneLabel;
 	private: System::Windows::Forms::Label^ oprocentowanieLabel;
@@ -65,6 +65,13 @@ namespace projekt {
 	private: System::Windows::Forms::Label^ label2;
 	private: System::Windows::Forms::Label^ label1;
 	private: System::Windows::Forms::GroupBox^ groupBox2;
+	private: System::Windows::Forms::ListView^ historiaPrzelewowListView;
+	private: System::Windows::Forms::ColumnHeader^ Rodzaj;
+	private: System::Windows::Forms::ColumnHeader^ numerKonta;
+	private: System::Windows::Forms::ColumnHeader^ kwota;
+	private: System::Windows::Forms::ColumnHeader^ tytul;
+	private: System::Windows::Forms::ColumnHeader^ data;
+
 
 	protected:
 
@@ -84,8 +91,13 @@ namespace projekt {
 			this->rachunkiComboBox = (gcnew System::Windows::Forms::ComboBox());
 			this->wylogujBtn = (gcnew System::Windows::Forms::Button());
 			this->userIdLabel = (gcnew System::Windows::Forms::Label());
-			this->historiaPrzelewowListBox = (gcnew System::Windows::Forms::ListBox());
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
+			this->historiaPrzelewowListView = (gcnew System::Windows::Forms::ListView());
+			this->Rodzaj = (gcnew System::Windows::Forms::ColumnHeader());
+			this->numerKonta = (gcnew System::Windows::Forms::ColumnHeader());
+			this->kwota = (gcnew System::Windows::Forms::ColumnHeader());
+			this->tytul = (gcnew System::Windows::Forms::ColumnHeader());
+			this->data = (gcnew System::Windows::Forms::ColumnHeader());
 			this->kosztyMiesieczneLabel = (gcnew System::Windows::Forms::Label());
 			this->oprocentowanieLabel = (gcnew System::Windows::Forms::Label());
 			this->rodzajRachunkuLabel = (gcnew System::Windows::Forms::Label());
@@ -113,14 +125,14 @@ namespace projekt {
 			this->rachunkiComboBox->FormattingEnabled = true;
 			this->rachunkiComboBox->Location = System::Drawing::Point(13, 17);
 			this->rachunkiComboBox->Name = L"rachunkiComboBox";
-			this->rachunkiComboBox->Size = System::Drawing::Size(394, 21);
+			this->rachunkiComboBox->Size = System::Drawing::Size(595, 21);
 			this->rachunkiComboBox->Sorted = true;
 			this->rachunkiComboBox->TabIndex = 0;
 			this->rachunkiComboBox->SelectedIndexChanged += gcnew System::EventHandler(this, &MyForm1::comboBox1_SelectedIndexChanged);
 			// 
 			// wylogujBtn
 			// 
-			this->wylogujBtn->Location = System::Drawing::Point(567, 16);
+			this->wylogujBtn->Location = System::Drawing::Point(815, 12);
 			this->wylogujBtn->Name = L"wylogujBtn";
 			this->wylogujBtn->Size = System::Drawing::Size(117, 32);
 			this->wylogujBtn->TabIndex = 1;
@@ -131,7 +143,7 @@ namespace projekt {
 			// userIdLabel
 			// 
 			this->userIdLabel->AutoSize = true;
-			this->userIdLabel->Location = System::Drawing::Point(468, 16);
+			this->userIdLabel->Location = System::Drawing::Point(710, 16);
 			this->userIdLabel->Name = L"userIdLabel";
 			this->userIdLabel->RightToLeft = System::Windows::Forms::RightToLeft::No;
 			this->userIdLabel->Size = System::Drawing::Size(79, 13);
@@ -139,16 +151,9 @@ namespace projekt {
 			this->userIdLabel->Text = L"U¿ytkownik ID:";
 			this->userIdLabel->TextAlign = System::Drawing::ContentAlignment::MiddleCenter;
 			// 
-			// historiaPrzelewowListBox
-			// 
-			this->historiaPrzelewowListBox->FormattingEnabled = true;
-			this->historiaPrzelewowListBox->Location = System::Drawing::Point(413, 36);
-			this->historiaPrzelewowListBox->Name = L"historiaPrzelewowListBox";
-			this->historiaPrzelewowListBox->Size = System::Drawing::Size(244, 251);
-			this->historiaPrzelewowListBox->TabIndex = 3;
-			// 
 			// groupBox1
 			// 
+			this->groupBox1->Controls->Add(this->historiaPrzelewowListView);
 			this->groupBox1->Controls->Add(this->kosztyMiesieczneLabel);
 			this->groupBox1->Controls->Add(this->oprocentowanieLabel);
 			this->groupBox1->Controls->Add(this->rodzajRachunkuLabel);
@@ -165,12 +170,51 @@ namespace projekt {
 			this->groupBox1->Controls->Add(this->saldoLabel);
 			this->groupBox1->Controls->Add(this->label2);
 			this->groupBox1->Controls->Add(this->label1);
-			this->groupBox1->Controls->Add(this->historiaPrzelewowListBox);
 			this->groupBox1->Location = System::Drawing::Point(12, 50);
 			this->groupBox1->Name = L"groupBox1";
-			this->groupBox1->Size = System::Drawing::Size(672, 297);
+			this->groupBox1->Size = System::Drawing::Size(920, 297);
 			this->groupBox1->TabIndex = 4;
 			this->groupBox1->TabStop = false;
+			// 
+			// historiaPrzelewowListView
+			// 
+			this->historiaPrzelewowListView->AllowColumnReorder = true;
+			this->historiaPrzelewowListView->Columns->AddRange(gcnew cli::array< System::Windows::Forms::ColumnHeader^  >(5) {
+				this->Rodzaj,
+					this->numerKonta, this->kwota, this->tytul, this->data
+			});
+			this->historiaPrzelewowListView->HideSelection = false;
+			this->historiaPrzelewowListView->Location = System::Drawing::Point(427, 32);
+			this->historiaPrzelewowListView->Name = L"historiaPrzelewowListView";
+			this->historiaPrzelewowListView->Size = System::Drawing::Size(487, 255);
+			this->historiaPrzelewowListView->TabIndex = 20;
+			this->historiaPrzelewowListView->UseCompatibleStateImageBehavior = false;
+			this->historiaPrzelewowListView->View = System::Windows::Forms::View::Details;
+			// 
+			// Rodzaj
+			// 
+			this->Rodzaj->Text = L"Rodzaj";
+			this->Rodzaj->Width = 78;
+			// 
+			// numerKonta
+			// 
+			this->numerKonta->Text = L"Numer konta";
+			this->numerKonta->Width = 106;
+			// 
+			// kwota
+			// 
+			this->kwota->Text = L"Kwota";
+			this->kwota->Width = 88;
+			// 
+			// tytul
+			// 
+			this->tytul->Text = L"Tytu³";
+			this->tytul->Width = 119;
+			// 
+			// data
+			// 
+			this->data->Text = L"Data";
+			this->data->Width = 105;
 			// 
 			// kosztyMiesieczneLabel
 			// 
@@ -324,7 +368,7 @@ namespace projekt {
 			// label1
 			// 
 			this->label1->AutoSize = true;
-			this->label1->Location = System::Drawing::Point(410, 16);
+			this->label1->Location = System::Drawing::Point(424, 16);
 			this->label1->Name = L"label1";
 			this->label1->Size = System::Drawing::Size(95, 13);
 			this->label1->TabIndex = 4;
@@ -335,7 +379,7 @@ namespace projekt {
 			this->groupBox2->Controls->Add(this->rachunkiComboBox);
 			this->groupBox2->Location = System::Drawing::Point(12, 6);
 			this->groupBox2->Name = L"groupBox2";
-			this->groupBox2->Size = System::Drawing::Size(423, 47);
+			this->groupBox2->Size = System::Drawing::Size(624, 47);
 			this->groupBox2->TabIndex = 5;
 			this->groupBox2->TabStop = false;
 			this->groupBox2->Text = L"Rachunek";
@@ -344,7 +388,7 @@ namespace projekt {
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(696, 353);
+			this->ClientSize = System::Drawing::Size(944, 353);
 			this->Controls->Add(this->groupBox2);
 			this->Controls->Add(this->groupBox1);
 			this->Controls->Add(this->userIdLabel);
@@ -377,6 +421,21 @@ namespace projekt {
 			std::list<Waluta>::iterator iter3 = API::Get().listaWalut.begin();
 			std::advance(iter3, (aktualnyRachunek.WalutaID() - 1));
 			Waluta aktualnaWaluta = *iter3;
+			API::Get().PobierzOperacje(aktualnyRachunek);
+			historiaPrzelewowListView->Items->Clear();
+			std::list<Operacja>::iterator iter4 = API::Get().listaOperacji.begin();
+			for (iter4; iter4 != API::Get().listaOperacji.end(); ++iter4) {
+				Operacja aktualnaOperacja = *iter4;
+				ListViewItem^ item = gcnew ListViewItem(((aktualnaOperacja.NumerNadawcy() == aktualnyRachunek.Numer()) ? "Obci¹¿enie" : "Uznanie"), 0);
+				std::string konto = ((aktualnaOperacja.NumerNadawcy() == aktualnyRachunek.Numer()) ? aktualnaOperacja.NumerOdbiorcy() : aktualnaOperacja.NumerNadawcy());
+				item->SubItems->Add(gcnew String(konto.c_str()));
+				std::string kwota = std::to_string(aktualnaOperacja.Kwota());
+				kwota = (kwota.substr(0, (kwota.length() - 4)) + " " + aktualnaWaluta.Nazwa());
+				item->SubItems->Add(gcnew String(kwota.c_str()));
+				item->SubItems->Add(gcnew String(aktualnaOperacja.Tytul().c_str()));
+				item->SubItems->Add(gcnew String(aktualnaOperacja.Data().c_str()));
+				historiaPrzelewowListView->Items->Add(item);
+			}
 			std::string saldo = std::to_string(aktualnyRachunek.Saldo());
 			saldoLabel->Text = gcnew String((saldo.substr(0, (saldo.length() - 4)) + " " + aktualnaWaluta.Nazwa()).c_str());
 			rodzajRachunkuLabel->Text = gcnew String(aktualnyRodzajRachunku.Nazwa().c_str());
@@ -405,6 +464,7 @@ namespace projekt {
 	private: System::Void MyForm1_Activated(System::Object^ sender, System::EventArgs^ e) {
 		API::Get().PobierzListeRachunkow();
 		rachunkiComboBox->Items->Clear();
+		historiaPrzelewowListView->Items->Clear();
 		std::list<Rachunek>::iterator iter = API::Get().listaRachunkow.begin();
 		for (iter; iter != API::Get().listaRachunkow.end(); ++iter) {
 			Rachunek rachunek = *iter;

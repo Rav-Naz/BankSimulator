@@ -3,18 +3,22 @@
 class Operacja
 {
 private:
-	int _numerNadawcy;
-	int _numerOdbiorcy;
+	std::string _numerNadawcy;
+	std::string _numerOdbiorcy;
 	std::string _data;
 	float _kwota;
+	std::wstring _tytul;
 
 public:
-	Operacja(int NumerNadawcy, int NumerOdbiorcy, float Kwota);
-	Operacja(int NumerNadawcy, int NumerOdbiorcy, float Kwota, std::string Data);
+	Operacja(std::string NumerNadawcy, std::string NumerOdbiorcy, float Kwota, std::wstring tytul);
+	Operacja(std::string NumerNadawcy, std::string NumerOdbiorcy, float Kwota, std::string Data, std::wstring tytul);
 
-	int NumerNadawcy();
-	int NumerOdbiorcy();
+	std::string NumerNadawcy();
+	std::string NumerOdbiorcy();
 	std::string Data();
+	std::wstring Tytul();
 	float Kwota();
+	
+	int ZlecPrzelew();
 };
 

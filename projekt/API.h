@@ -8,6 +8,7 @@
 #include "RodzajRachunku.h"
 #include "Konto.h"
 #include "Rachunek.h"
+#include "Operacja.h"
 
 class API
 {
@@ -27,6 +28,7 @@ public:
 	std::list<Waluta> listaWalut;
 	std::list<Rachunek> listaRachunkow;
 	std::list<RodzajRachunku> listaRodzajiRachunkow;
+	std::list<Operacja> listaOperacji;
 	// Logowanie
 	int Logowanie(std::string id_uzytkownika, std::string haslo);
 	// Waluty
@@ -38,7 +40,8 @@ public:
 	// Rodzaj rachunku
 	void PobierzRodzajeRachunku();
 	// Operacje
-	int ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::string kwota, std::string tytul);
+	int ZlecPrzelew(Operacja operacja);
+	void PobierzOperacje(Rachunek rachunek);
 
 private:
 	API() {};

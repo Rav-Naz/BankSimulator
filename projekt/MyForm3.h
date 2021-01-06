@@ -230,7 +230,7 @@ namespace projekt {
 		char* end;
 		msclr::interop::marshal_context context;
 		std::string numerOdbiocy = context.marshal_as<std::string>(this->numerRachunkuTextBox->Text);
-		std::string tytul = context.marshal_as<std::string>(this->tytulTextBox->Text);
+		std::wstring tytul = context.marshal_as<std::wstring>(this->tytulTextBox->Text);
 		std::string kwota = context.marshal_as<std::string>(this->kwotaTextBox->Text);
 		float nowy = std::strtof(kwota.c_str(), &end);
 		if (rachunek.Saldo() < nowy) {
@@ -253,8 +253,8 @@ namespace projekt {
 			::MessageBox(0, L"Wpisz tytu³", L"Uwaga", MB_ICONWARNING);
 			return;
 		}
-		kwota = std::to_string(nowy).substr(0, (std::to_string(nowy).length() - 4));
-		int result = API::Get().ZlecPrzelew(rachunek.Numer(), numerOdbiocy, kwota, tytul);
+		Operacja nowaOperacja = Operacja(rachunek.Numer(), numerOdbiocy, nowy, tytul);
+		int result = nowaOperacja.ZlecPrzelew();
 
 		if (result == 0) {
 			::MessageBox(0, L"Napotkano nieoczekiwany b³¹d. Spróbuj ponownie póŸniej", L"B³¹d", MB_ICONERROR);

@@ -7,13 +7,17 @@
 #include <algorithm>
 #include <msclr\marshal_cppstd.h>
 #include <cstdlib> 
-#include <ctime> 
+#include <ctime>
+#include <locale>
+#include <codecvt>
+#include <string>
 
 #include "Waluta.h"
 #include "RodzajRachunku.h"
 #include "API.h"
 #include "Konto.h"
 #include "Rachunek.h"
+#include "Operacja.h"
 
 // -------------------- Baza danych --------------------
 
@@ -30,10 +34,6 @@ bool API::isConnected() {
 		return false;
 	}
 }
-
-// -------------------- Zmienne globalne --------------------
-
-
 
 // -------------------- Logowanie --------------------
 
@@ -267,7 +267,7 @@ void API::PobierzRodzajeRachunku() {
 
 // -------------------- Operacje --------------------
 
-int API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::string kwota, std::string tytul) {
+int API::ZlecPrzelew(Operacja operacja) {
 	if (!this->isConnected()) { return 0; }
 	MYSQL_RES* res;
 	MYSQL_ROW row;
@@ -277,7 +277,8 @@ int API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::s
 	std::string query3;
 	std::string query4;
 	std::string query5;
-	query.append("SELECT " + numerOdbiorcy + " IN (SELECT Numer FROM projektcpp.rachunki) AS Istnieje;");
+	std::string kwota = std::to_string(operacja.Kwota()).substr(0, (std::to_string(operacja.Kwota()).length() - 4));
+	query.append("SELECT " + operacja.NumerOdbiorcy() + " IN (SELECT Numer FROM projektcpp.rachunki) AS Istnieje;");
 	const char* q = query.c_str();
 	int qstate = mysql_query(this->conn, q);
 	if (!qstate)
@@ -295,7 +296,7 @@ int API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::s
 	}
 	MYSQL_RES* res4;
 	MYSQL_ROW row4;
-	query4.append("SELECT IF( (IF(Suma.Suma IS NULL, 0, Suma.Suma) + " + kwota + ") > Limity.LimitDzienny,1,0) AS Przekroczony FROM (SELECT SUM(Kwota) AS Suma FROM projektcpp.operacje WHERE NumerNadawcy = " + numerNadawcy + " AND DATE(DataWykonania) = CURDATE()) AS Suma, (SELECT LimitDzienny FROM projektcpp.rachunki WHERE Numer = " + numerNadawcy + ") AS Limity;");
+	query4.append("SELECT IF( (IF(Suma.Suma IS NULL, 0, Suma.Suma) + " + kwota + ") > Limity.LimitDzienny,1,0) AS Przekroczony FROM (SELECT SUM(Kwota) AS Suma FROM projektcpp.operacje WHERE NumerNadawcy = " + operacja.NumerNadawcy() + " AND DATE(DataWykonania) = CURDATE()) AS Suma, (SELECT LimitDzienny FROM projektcpp.rachunki WHERE Numer = " + operacja.NumerNadawcy() + ") AS Limity;");
 	const char* q4 = query4.c_str();
 	int qstate4 = mysql_query(this->conn, q4);
 	if (!qstate4)
@@ -313,7 +314,7 @@ int API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::s
 	}
 	MYSQL_RES* res5;
 	MYSQL_ROW row5;
-	query5.append("SELECT IF((IF(Suma.Suma IS NULL, 0, Suma.Suma) + " + kwota + ") > Limity.LimitMiesieczny,1,0) AS Przekroczony FROM (SELECT SUM(Kwota) AS Suma FROM projektcpp.operacje, (SELECT DATE(CONCAT(SUBSTRING(CURDATE(), 1, 7),\"-01\")) AS Start, ADDDATE(DATE(CONCAT(SUBSTRING(CURDATE(), 1, 7),\"-01\")), INTERVAL 1 MONTH) AS End) AS Daty WHERE NumerNadawcy = " + numerNadawcy + " AND DATE(DataWykonania) >= Daty.Start AND DATE(DataWykonania) < Daty.End) AS Suma, (SELECT LimitMiesieczny FROM projektcpp.rachunki WHERE Numer = " + numerNadawcy + ") AS Limity;");
+	query5.append("SELECT IF((IF(Suma.Suma IS NULL, 0, Suma.Suma) + " + kwota + ") > Limity.LimitMiesieczny,1,0) AS Przekroczony FROM (SELECT SUM(Kwota) AS Suma FROM projektcpp.operacje, (SELECT DATE(CONCAT(SUBSTRING(CURDATE(), 1, 7),\"-01\")) AS Start, ADDDATE(DATE(CONCAT(SUBSTRING(CURDATE(), 1, 7),\"-01\")), INTERVAL 1 MONTH) AS End) AS Daty WHERE NumerNadawcy = " + operacja.NumerNadawcy() + " AND DATE(DataWykonania) >= Daty.Start AND DATE(DataWykonania) < Daty.End) AS Suma, (SELECT LimitMiesieczny FROM projektcpp.rachunki WHERE Numer = " + operacja.NumerNadawcy() + ") AS Limity;");
 	const char* q5 = query5.c_str();
 	int qstate5 = mysql_query(this->conn, q5);
 	if (!qstate5)
@@ -329,9 +330,13 @@ int API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::s
 		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
 		return 0;
 	}
-	query1.append("UPDATE projektcpp.rachunki SET Saldo = Saldo - " + kwota + " WHERE Numer = " + numerNadawcy + ";" );
-	query2.append("UPDATE projektcpp.rachunki SET Saldo = Saldo + (" + kwota + " * (SELECT(PrzelicznikNadawcy.Przelicznik / PrzelicznikOdbiorcy.Przelicznik) AS Przelicznik FROM(SELECT Przelicznik FROM projektcpp.rachunki LEFT JOIN projektcpp.waluty ON projektcpp.rachunki.WalutaID = projektcpp.waluty.ID WHERE projektcpp.rachunki.Numer = " + numerNadawcy + " LIMIT 1) AS PrzelicznikNadawcy, (SELECT Przelicznik FROM projektcpp.rachunki LEFT JOIN projektcpp.waluty ON projektcpp.rachunki.WalutaID = projektcpp.waluty.ID WHERE projektcpp.rachunki.Numer = " + numerOdbiorcy + " LIMIT 1) AS PrzelicznikOdbiorcy)) WHERE Numer = " + numerOdbiorcy + ";");
-	query3.append("INSERT INTO projektcpp.operacje(NumerNadawcy, NumerOdbiorcy, Kwota, Tytul) VALUES(" + numerNadawcy + ", " + numerOdbiorcy + ", " + kwota +", \" " + tytul +"\");");
+	using convert_type = std::codecvt_utf8<wchar_t>;
+	std::wstring_convert<convert_type, wchar_t> converter;
+	std::string narrow = converter.to_bytes(operacja.Tytul());
+	std::cout << narrow;
+	query1.append("UPDATE projektcpp.rachunki SET Saldo = Saldo - " + kwota + " WHERE Numer = " + operacja.NumerNadawcy() + ";" );
+	query2.append("UPDATE projektcpp.rachunki SET Saldo = Saldo + (" + kwota + " * (SELECT(PrzelicznikNadawcy.Przelicznik / PrzelicznikOdbiorcy.Przelicznik) AS Przelicznik FROM(SELECT Przelicznik FROM projektcpp.rachunki LEFT JOIN projektcpp.waluty ON projektcpp.rachunki.WalutaID = projektcpp.waluty.ID WHERE projektcpp.rachunki.Numer = " + operacja.NumerNadawcy() + " LIMIT 1) AS PrzelicznikNadawcy, (SELECT Przelicznik FROM projektcpp.rachunki LEFT JOIN projektcpp.waluty ON projektcpp.rachunki.WalutaID = projektcpp.waluty.ID WHERE projektcpp.rachunki.Numer = " + operacja.NumerOdbiorcy() + " LIMIT 1) AS PrzelicznikOdbiorcy)) WHERE Numer = " + operacja.NumerOdbiorcy() + ";");
+	query3.append("INSERT INTO projektcpp.operacje(NumerNadawcy, NumerOdbiorcy, Kwota, Tytul) VALUES(" + operacja.NumerNadawcy() + ", " + operacja.NumerOdbiorcy() + ", " + kwota +", \" " + narrow +"\");");
 	const char* q1 = query1.c_str();
 	const char* q2 = query2.c_str();
 	const char* q3 = query3.c_str();
@@ -340,3 +345,39 @@ int API::ZlecPrzelew(std::string numerNadawcy, std::string numerOdbiorcy, std::s
 	mysql_query(this->conn, q3);
 	return 1;
 };
+
+void API::PobierzOperacje(Rachunek rachunek) {
+	if (!this->isConnected()) { return; }
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	std::string query;
+	query.append("SELECT NumerNadawcy, NumerOdbiorcy, ROUND(IF(NumerNadawcy = " + rachunek.Numer() + ", Kwota, Kwota * (waluty1.Przelicznik/waluty2.Przelicznik)),2) AS Kwota, Tytul, DATE(DataWykonania) AS Data");
+	query.append(" FROM projektcpp.operacje");
+	query.append(" LEFT JOIN projektcpp.rachunki AS rachunki1");
+	query.append(" ON NumerNadawcy = rachunki1.Numer");
+	query.append(" LEFT JOIN projektcpp.rachunki AS rachunki2");
+	query.append(" ON NumerOdbiorcy = rachunki2.Numer");
+	query.append(" LEFT JOIN projektcpp.waluty AS waluty1");
+	query.append(" ON rachunki1.WalutaID = waluty1.ID");
+	query.append(" LEFT JOIN projektcpp.waluty AS waluty2");
+	query.append(" ON rachunki2.WalutaID = waluty2.ID");
+	query.append(" WHERE NumerNadawcy = " + rachunek.Numer() + " OR NumerOdbiorcy = " + rachunek.Numer());
+	query.append(" ORDER BY Data ASC; ");
+	const char* q = query.c_str();
+	int qstate;
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
+	qstate = mysql_query(this->conn, q);
+	this->listaOperacji.clear();
+	if (!qstate)
+	{
+		res = mysql_store_result(this->conn);
+		while (row = mysql_fetch_row(res)) {
+			std::wstring wide = converter.from_bytes(row[3]);
+			this->listaOperacji.push_front(Operacja(row[0], row[1], atof(row[2]), row[4], wide));
+		}
+	}
+	else
+	{
+		std::cout << "Query failed: " << mysql_error(conn) << std::endl;
+	}
+}
