@@ -31,10 +31,11 @@ public:
 	std::list<Operacja> listaOperacji;
 	// Logowanie
 	int Logowanie(std::string id_uzytkownika, std::string haslo);
+	std::string UtworzKonto(std::string haslo);
 	// Waluty
 	void PobierzWaluty();
 	// Rachunki
-	void UtworzNowyRachunek(std::string Nazwa, int RodzajID, int WalutaID);
+	void UtworzNowyRachunek(std::wstring Nazwa, int RodzajID, int WalutaID);
 	void PobierzListeRachunkow();
 	void ZmienLimit(std::string Numer, float limit, bool CzyMiesieczny);
 	// Rodzaj rachunku

@@ -1,18 +1,21 @@
 #include "Rachunek.h"
 #include "API.h"
 #include <string>
+#include <locale>
+#include <codecvt>
 
 Rachunek::Rachunek(std::string Numer, std::string UzytkownikID) {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	this->_numer = Numer;
 	this->_uzytkownikID = UzytkownikID;
-	this->_nazwa = "Rachunek Oszczêdnoœciowo-Rozliczeniowy";
+	this->_nazwa = converter.from_bytes("Rachunek Oszczêdnoœciowo-Rozliczeniowy");
 	this->_rodzajID = 1;
 	this->_limitDzienny = 50.0f;
 	this->_limitMiesieczny = 1000.0f;
 	this->_saldo = 0.0;
 	this->_walutaID = 1;
 };
-Rachunek::Rachunek(std::string Numer, std::string UzytkownikID, std::string Nazwa, int RodzajID, int WalutaID) {
+Rachunek::Rachunek(std::string Numer, std::string UzytkownikID, std::wstring Nazwa, int RodzajID, int WalutaID) {
 	this->_numer = Numer;
 	this->_uzytkownikID = UzytkownikID;
 	this->_nazwa = Nazwa;
@@ -22,7 +25,7 @@ Rachunek::Rachunek(std::string Numer, std::string UzytkownikID, std::string Nazw
 	this->_saldo = 0.0;
 	this->_walutaID = WalutaID;
 };
-Rachunek::Rachunek(std::string Numer, std::string UzytkownikID, std::string Nazwa, int RodzajID, float LimitDzienny, float LimitMiesieczny, double Saldo, int WalutaID) {
+Rachunek::Rachunek(std::string Numer, std::string UzytkownikID, std::wstring Nazwa, int RodzajID, float LimitDzienny, float LimitMiesieczny, double Saldo, int WalutaID) {
 	this->_numer = Numer;
 	this->_uzytkownikID = UzytkownikID;
 	this->_nazwa = Nazwa;
@@ -48,7 +51,7 @@ std::string Rachunek::Numer() {
 std::string Rachunek::UzytkownikID() {
 	return this->_uzytkownikID;
 };
-std::string Rachunek::Nazwa() {
+std::wstring Rachunek::Nazwa() {
 	return this->_nazwa;
 };
 int Rachunek::RodzajID() {

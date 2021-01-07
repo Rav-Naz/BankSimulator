@@ -6,6 +6,7 @@
 #include "Logowanie.h"
 #include "Konto.h"
 
+#include "MyForm4.h"
 #include "MyForm1.h"
 #include "MyForm.h"
 
@@ -54,6 +55,7 @@ namespace projekt {
 	private: System::Windows::Forms::Button^ zalogujBtn;
 	private: System::Windows::Forms::GroupBox^ groupBox1;
 	private: System::Windows::Forms::GroupBox^ groupBox2;
+	private: System::Windows::Forms::Button^ utworzKontoBtn;
 
 	protected:
 
@@ -76,11 +78,13 @@ namespace projekt {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MyForm::typeid));
 			this->loginTextBox = (gcnew System::Windows::Forms::TextBox());
 			this->hasloTextBox = (gcnew System::Windows::Forms::TextBox());
 			this->zalogujBtn = (gcnew System::Windows::Forms::Button());
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
 			this->groupBox2 = (gcnew System::Windows::Forms::GroupBox());
+			this->utworzKontoBtn = (gcnew System::Windows::Forms::Button());
 			this->groupBox1->SuspendLayout();
 			this->groupBox2->SuspendLayout();
 			this->SuspendLayout();
@@ -107,9 +111,9 @@ namespace projekt {
 			this->zalogujBtn->BackColor = System::Drawing::SystemColors::ControlDarkDark;
 			this->zalogujBtn->FlatStyle = System::Windows::Forms::FlatStyle::System;
 			this->zalogujBtn->ForeColor = System::Drawing::SystemColors::ControlText;
-			this->zalogujBtn->Location = System::Drawing::Point(67, 133);
+			this->zalogujBtn->Location = System::Drawing::Point(123, 133);
 			this->zalogujBtn->Name = L"zalogujBtn";
-			this->zalogujBtn->Size = System::Drawing::Size(113, 38);
+			this->zalogujBtn->Size = System::Drawing::Size(99, 31);
 			this->zalogujBtn->TabIndex = 4;
 			this->zalogujBtn->Text = L"Zaloguj";
 			this->zalogujBtn->UseVisualStyleBackColor = false;
@@ -118,7 +122,7 @@ namespace projekt {
 			// groupBox1
 			// 
 			this->groupBox1->Controls->Add(this->loginTextBox);
-			this->groupBox1->Location = System::Drawing::Point(19, 12);
+			this->groupBox1->Location = System::Drawing::Point(12, 12);
 			this->groupBox1->Name = L"groupBox1";
 			this->groupBox1->Size = System::Drawing::Size(210, 53);
 			this->groupBox1->TabIndex = 5;
@@ -128,22 +132,38 @@ namespace projekt {
 			// groupBox2
 			// 
 			this->groupBox2->Controls->Add(this->hasloTextBox);
-			this->groupBox2->Location = System::Drawing::Point(19, 71);
+			this->groupBox2->Location = System::Drawing::Point(12, 71);
 			this->groupBox2->Name = L"groupBox2";
 			this->groupBox2->Size = System::Drawing::Size(210, 56);
 			this->groupBox2->TabIndex = 6;
 			this->groupBox2->TabStop = false;
 			this->groupBox2->Text = L"Hasło";
 			// 
+			// utworzKontoBtn
+			// 
+			this->utworzKontoBtn->BackColor = System::Drawing::SystemColors::ControlDarkDark;
+			this->utworzKontoBtn->FlatStyle = System::Windows::Forms::FlatStyle::System;
+			this->utworzKontoBtn->ForeColor = System::Drawing::SystemColors::ControlText;
+			this->utworzKontoBtn->Location = System::Drawing::Point(12, 133);
+			this->utworzKontoBtn->Name = L"utworzKontoBtn";
+			this->utworzKontoBtn->Size = System::Drawing::Size(99, 31);
+			this->utworzKontoBtn->TabIndex = 7;
+			this->utworzKontoBtn->Text = L"Utwórz konto";
+			this->utworzKontoBtn->UseVisualStyleBackColor = false;
+			this->utworzKontoBtn->Click += gcnew System::EventHandler(this, &MyForm::utworzKontoBtn_Click);
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackgroundImageLayout = System::Windows::Forms::ImageLayout::Stretch;
-			this->ClientSize = System::Drawing::Size(248, 189);
+			this->ClientSize = System::Drawing::Size(237, 174);
+			this->Controls->Add(this->utworzKontoBtn);
 			this->Controls->Add(this->groupBox2);
 			this->Controls->Add(this->groupBox1);
 			this->Controls->Add(this->zalogujBtn);
+			this->Cursor = System::Windows::Forms::Cursors::Default;
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"$this.Icon")));
 			this->Name = L"MyForm";
 			this->Text = L"Logowanie";
 			this->Load += gcnew System::EventHandler(this, &MyForm::MyForm_Load);
@@ -159,12 +179,6 @@ namespace projekt {
 
 	}
 	private: System::Void zalogujBtn_Click(System::Object^ sender, System::EventArgs^ e) {
-		
-		API::Get().uzytkownik = new Konto("662347","Password");
-		this->Hide();
-		MyForm1^ clientPanel = gcnew MyForm1(this);
-		auto result = clientPanel->ShowDialog();
-		return;
 
 		msclr::interop::marshal_context context;
 		std::string uzytkownikId = context.marshal_as<std::string>(this->loginTextBox->Text);
@@ -191,6 +205,12 @@ namespace projekt {
 			::MessageBox(0, L"Napotkano nieoczekiwany błąd. Spróbuj ponownie później", L"Błąd", MB_ICONERROR);
 		}
 
+	}
+
+	private: System::Void utworzKontoBtn_Click(System::Object^ sender, System::EventArgs^ e) {
+		this->Hide();
+		MyForm4^ newAccount = gcnew MyForm4(this);
+		auto result = newAccount->ShowDialog();
 	}
 };
 }

@@ -1,5 +1,8 @@
 #pragma once
 #include <iostream>
+#include <locale>
+#include <codecvt>
+#include <string>
 
 #include "MyForm3.h"
 #include "MyForm2.h"
@@ -88,6 +91,7 @@ namespace projekt {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MyForm1::typeid));
 			this->rachunkiComboBox = (gcnew System::Windows::Forms::ComboBox());
 			this->wylogujBtn = (gcnew System::Windows::Forms::Button());
 			this->userIdLabel = (gcnew System::Windows::Forms::Label());
@@ -126,7 +130,6 @@ namespace projekt {
 			this->rachunkiComboBox->Location = System::Drawing::Point(13, 17);
 			this->rachunkiComboBox->Name = L"rachunkiComboBox";
 			this->rachunkiComboBox->Size = System::Drawing::Size(595, 21);
-			this->rachunkiComboBox->Sorted = true;
 			this->rachunkiComboBox->TabIndex = 0;
 			this->rachunkiComboBox->SelectedIndexChanged += gcnew System::EventHandler(this, &MyForm1::comboBox1_SelectedIndexChanged);
 			// 
@@ -209,12 +212,12 @@ namespace projekt {
 			// tytul
 			// 
 			this->tytul->Text = L"Tytu³";
-			this->tytul->Width = 119;
+			this->tytul->Width = 112;
 			// 
 			// data
 			// 
 			this->data->Text = L"Data";
-			this->data->Width = 105;
+			this->data->Width = 98;
 			// 
 			// kosztyMiesieczneLabel
 			// 
@@ -241,7 +244,7 @@ namespace projekt {
 			this->rodzajRachunkuLabel->AutoSize = true;
 			this->rodzajRachunkuLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 9.75F, System::Drawing::FontStyle::Regular,
 				System::Drawing::GraphicsUnit::Point, static_cast<System::Byte>(238)));
-			this->rodzajRachunkuLabel->Location = System::Drawing::Point(106, 63);
+			this->rodzajRachunkuLabel->Location = System::Drawing::Point(106, 64);
 			this->rodzajRachunkuLabel->Name = L"rodzajRachunkuLabel";
 			this->rodzajRachunkuLabel->Size = System::Drawing::Size(0, 16);
 			this->rodzajRachunkuLabel->TabIndex = 17;
@@ -338,7 +341,7 @@ namespace projekt {
 			// label3
 			// 
 			this->label3->AutoSize = true;
-			this->label3->Location = System::Drawing::Point(15, 65);
+			this->label3->Location = System::Drawing::Point(15, 66);
 			this->label3->Name = L"label3";
 			this->label3->Size = System::Drawing::Size(91, 13);
 			this->label3->TabIndex = 7;
@@ -349,7 +352,7 @@ namespace projekt {
 			this->saldoLabel->AutoSize = true;
 			this->saldoLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 20.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(238)));
-			this->saldoLabel->Location = System::Drawing::Point(168, 16);
+			this->saldoLabel->Location = System::Drawing::Point(97, 17);
 			this->saldoLabel->Name = L"saldoLabel";
 			this->saldoLabel->Size = System::Drawing::Size(0, 31);
 			this->saldoLabel->TabIndex = 6;
@@ -359,7 +362,7 @@ namespace projekt {
 			this->label2->AutoSize = true;
 			this->label2->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 15.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(238)));
-			this->label2->Location = System::Drawing::Point(104, 22);
+			this->label2->Location = System::Drawing::Point(33, 23);
 			this->label2->Name = L"label2";
 			this->label2->Size = System::Drawing::Size(73, 25);
 			this->label2->TabIndex = 5;
@@ -393,6 +396,7 @@ namespace projekt {
 			this->Controls->Add(this->groupBox1);
 			this->Controls->Add(this->userIdLabel);
 			this->Controls->Add(this->wylogujBtn);
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"$this.Icon")));
 			this->Name = L"MyForm1";
 			this->Text = L"Panel klienta";
 			this->Activated += gcnew System::EventHandler(this, &MyForm1::MyForm1_Activated);
@@ -412,6 +416,7 @@ namespace projekt {
 			auto result = clientPanel->ShowDialog();
 		}
 		else {
+			API::Get().PobierzListeRachunkow();
 			std::list<Rachunek>::iterator iter = API::Get().listaRachunkow.begin();
 			std::advance(iter, rachunkiComboBox->SelectedIndex);
 			Rachunek aktualnyRachunek = *iter;
@@ -441,7 +446,7 @@ namespace projekt {
 			rodzajRachunkuLabel->Text = gcnew String(aktualnyRodzajRachunku.Nazwa().c_str());
 			std::string oprocentowanie = std::to_string(aktualnyRodzajRachunku.Oprocentowanie());
 			oprocentowanieLabel->Text = gcnew String((oprocentowanie.substr(0, (oprocentowanie.length() - 4)) + " %").c_str());
-			std::string kosztyMiesieczne = std::to_string(aktualnyRodzajRachunku.KosztyMiesieczne());
+			std::string kosztyMiesieczne = std::to_string(aktualnyRodzajRachunku.KosztyMiesieczne() * Waluta().PrzeliczNaWalute(aktualnaWaluta));
 			kosztyMiesieczneLabel->Text = gcnew String((kosztyMiesieczne.substr(0, (kosztyMiesieczne.length() - 4)) + " " + aktualnaWaluta.Nazwa()).c_str());
 			std::string limitDzienny = std::to_string(aktualnyRachunek.LimitDzienny());
 			limitDziennyTextBox->Text = gcnew String((limitDzienny.substr(0, (limitDzienny.length() - 4)) + " " + aktualnaWaluta.Nazwa()).c_str());
@@ -466,9 +471,11 @@ namespace projekt {
 		rachunkiComboBox->Items->Clear();
 		historiaPrzelewowListView->Items->Clear();
 		std::list<Rachunek>::iterator iter = API::Get().listaRachunkow.begin();
+		using convert_type = std::codecvt_utf8<wchar_t>;
+		std::wstring_convert<convert_type, wchar_t> converter;
 		for (iter; iter != API::Get().listaRachunkow.end(); ++iter) {
 			Rachunek rachunek = *iter;
-			auto managed = gcnew String((rachunek.Numer() + "  |  " + rachunek.Nazwa()).c_str());
+			auto managed = gcnew String(rachunek.Numer().c_str()) + " | " + gcnew String(rachunek.Nazwa().c_str());
 			rachunkiComboBox->Items->Add(managed);
 		}
 		rachunkiComboBox->Items->Add("Utwórz nowy...");

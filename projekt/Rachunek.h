@@ -5,7 +5,7 @@ class Rachunek
 private:
 	std::string _numer;
 	std::string _uzytkownikID;
-	std::string _nazwa;
+	std::wstring _nazwa;
 	int _rodzajID;
 	float _limitDzienny;
 	float _limitMiesieczny;
@@ -13,13 +13,13 @@ private:
 	int _walutaID;
 public:
 	Rachunek(std::string Numer, std::string UzytkownikID);
-	Rachunek(std::string Numer, std::string UzytkownikID, std::string Nazwa, int RodzajID, int WalutaID);
-	Rachunek(std::string Numer, std::string UzytkownikID, std::string Nazwa, int RodzajID, float LimitDzienny, float LimitMiesieczny, double Saldo, int WalutaID);
+	Rachunek(std::string Numer, std::string UzytkownikID, std::wstring Nazwa, int RodzajID, int WalutaID);
+	Rachunek(std::string Numer, std::string UzytkownikID, std::wstring Nazwa, int RodzajID, float LimitDzienny, float LimitMiesieczny, double Saldo, int WalutaID);
 	Rachunek(Rachunek& Wzor);
 
 	std::string Numer();
 	std::string UzytkownikID();
-	std::string Nazwa();
+	std::wstring Nazwa();
 	int RodzajID();
 	float LimitDzienny();
 	float LimitMiesieczny();

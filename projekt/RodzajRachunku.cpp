@@ -1,13 +1,17 @@
 #include "RodzajRachunku.h"
+#include <locale>
+#include <codecvt>
+#include <string>
 
 RodzajRachunku::RodzajRachunku() {
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 	this->_id = 1;
-	this->_nazwa = "ROR";
+	this->_nazwa = converter.from_bytes("ROR");
 	this->_oprocentowanie = 0.0f;
 	this->_kosztyMiesieczne = 1;
 };
 
-RodzajRachunku::RodzajRachunku(int ID, std::string Nazwa, float Oprocentowanie, float KosztyMiesieczne) {
+RodzajRachunku::RodzajRachunku(int ID, std::wstring Nazwa, float Oprocentowanie, float KosztyMiesieczne) {
 	this->_id = ID;
 	this->_nazwa = Nazwa;
 	this->_oprocentowanie = Oprocentowanie;
@@ -23,7 +27,7 @@ RodzajRachunku::RodzajRachunku(RodzajRachunku& wzor) {
 int RodzajRachunku::ID() {
 	return this->_id;
 };
-std::string RodzajRachunku::Nazwa() {
+std::wstring RodzajRachunku::Nazwa() {
 	return this->_nazwa;
 };
 float RodzajRachunku::Oprocentowanie() {

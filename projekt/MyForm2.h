@@ -77,6 +77,7 @@ namespace projekt {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::ComponentModel::ComponentResourceManager^ resources = (gcnew System::ComponentModel::ComponentResourceManager(MyForm2::typeid));
 			this->rachunkiComboBox = (gcnew System::Windows::Forms::ComboBox());
 			this->groupBox1 = (gcnew System::Windows::Forms::GroupBox());
 			this->oprocentowanieLabel = (gcnew System::Windows::Forms::Label());
@@ -245,6 +246,7 @@ namespace projekt {
 			this->Controls->Add(this->utworzBtn);
 			this->Controls->Add(this->kosztyMiesieczneLabel);
 			this->Controls->Add(this->oprocentowanieLabel);
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"$this.Icon")));
 			this->Location = System::Drawing::Point(81, 236);
 			this->Name = L"MyForm2";
 			this->Text = L"Utwórz nowy rachunek";
@@ -322,7 +324,7 @@ namespace projekt {
 
 	private: System::Void utworzBtn_Click(System::Object^ sender, System::EventArgs^ e) {
 		msclr::interop::marshal_context context;
-		std::string nazwaWlasna = context.marshal_as<std::string>(this->nazwaWlasnaTextBox->Text);
+		std::wstring nazwaWlasna = context.marshal_as<std::wstring>(this->nazwaWlasnaTextBox->Text);
 		if (nazwaWlasna.length() <= 0) {
 			::MessageBox(0, L"WprowadŸ nazwê w³asn¹", L"Uwaga", MB_ICONWARNING);
 			return;
